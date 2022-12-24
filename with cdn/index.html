@@ -10,6 +10,17 @@
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
-        <div id="app"></div>
+        <div id="app">
+            <img
+                :class="gender"
+                :src="picture"
+                :alt="`${firstname} ${lastname}`"
+            />
+            <h1>{{firstname}} {{lastname}}</h1>
+            <h3>{{email}}</h3>
+            <button v-on:click="getUser()" :class="gender">
+                Get Random User
+            </button>
+        </div>
     </body>
 </html>
