@@ -41,8 +41,17 @@ export default {
                 task.id === id ? { ...task, reminder: !task.reminder } : task
             );
         },
-        addTask(task) {
-            this.tasks = [...this.tasks, task];
+        async addTask(task) {
+            const res = await fetch("api/tasks", {
+                method: "POST",
+                headers: {
+                    "Content-type": "application/json",
+                },
+                body: JSON.stringify(task),
+            });
+            const data = await res.json();
+
+            this.tasks = [...this.tasks, data];
         },
         toggleAddTask() {
             this.showAddTask = !this.showAddTask;
