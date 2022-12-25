@@ -13,5 +13,8 @@
   "devDependencies": {
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-service": "~5.0.0"
+  },
+  "rules": {
+    "vue/no-multiple-template-root": "off"
   }
 }

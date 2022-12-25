@@ -1,14 +1,46 @@
 <template>
   <div class="container">
-    <h1>Hello from cli </h1>
+    <Header title="list" />
+	<Tasks :tasks="tasks" />
   </div>
 </template>
 
 <script>
+import Header from './components/Header.vue'
+import Tasks from './components/Tasks.vue'
+
 export default {
   name: 'App',
   components: {
-  }
+    Header,
+    Tasks
+  },
+  data() {
+    return {
+      tasks : []
+    }
+  },
+  created(){
+    this.tasks = [{
+      id: 1,
+      text: 'Learn Vue',
+      day: 'May 5th at 2:30pm',
+      reminder: true
+    },
+    {
+      id: 2,
+      text: 'Learn React',
+      day: 'May 6th at 2:30pm',
+      reminder: true
+    },
+    {
+      id: 3,
+      text: 'Learn Angular',
+      day: 'May 7th at 2:30pm',
+      reminder: true
+    }]
+  },
+
 }
 </script>
 
@@ -60,7 +92,5 @@ h1{
   display: block;
   width: 100%;
 }
-
-
 
 </style>
