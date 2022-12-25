@@ -44,7 +44,6 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(to bottom, #68eacc 0%, #497be8 100%);
 }
 
 .container {
@@ -52,7 +51,7 @@ body {
     margin: 30px auto;
     overflow: hidden;
     min-height: 300px;
-    border: 2px solid steelblue;
+    border: 1px solid steelblue;
     padding: 30px;
     border-radius: 5px;
 }
