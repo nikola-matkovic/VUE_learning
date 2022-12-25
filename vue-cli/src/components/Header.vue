@@ -2,9 +2,9 @@
     <header>
         <h1>TODO {{ title }}</h1>
         <Button
-            @toggle-add-task="$emit('toggle-add-task')"
-            text="Add task"
-            color="green"
+            @btn-click="$emit('toggle-add-task')"
+            :text="showAddTask ? 'Close' : 'Add Task'"
+            :color="showAddTask ? 'red' : 'green'"
         />
     </header>
 </template>
@@ -21,6 +21,10 @@ export default {
             type: String,
             required: true,
             default: "list",
+        },
+        showAddTask: {
+            type: Boolean,
+            required: true,
         },
     },
     components: {

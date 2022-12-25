@@ -81,8 +81,12 @@ export default {
     flex: 1;
 }
 
-.form-control input {
+.form-control-check input {
     flex: 2;
     height: 20px;
+}
+
+input[type="submit"] {
+    margin-bottom: 20px;
 }
 </style>
