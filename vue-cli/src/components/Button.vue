@@ -1,27 +1,27 @@
 <template>
-    <button class="btn" :style= "{background: color}" @click="onclick()">
-        {{text}}
+    <button class="btn" :style="{ background: color }" @click="onclick()">
+        {{ text }}
     </button>
 </template>
 
 <script>
 export default {
-    name: 'Button',
+    name: "Button",
     props: {
         text: {
             type: String,
-            required: true
+            required: true,
         },
         color: {
             type: String,
-            required: true
-        }
+            required: true,
+        },
     },
     methods: {
         onclick() {
-            this.$emit("toggle-add-task")
-        }
+            this.$emit("toggle-add-task");
+        },
     },
-    emits: ['toggle-add-task']
-}
+    emits: ["toggle-add-task"],
+};
 </script>

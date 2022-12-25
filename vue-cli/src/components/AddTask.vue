@@ -10,7 +10,7 @@
         </div>
         <div class="form-control form-control-check">
             <label>Set Reminder</label>
-            <input type="checkbox"  v-model="reminder"/>
+            <input type="checkbox" v-model="reminder" />
         </div>
         <input type="submit" value="Save Task" class="btn btn-block" />
     </form>
@@ -18,36 +18,36 @@
 
 <script>
 export default {
-    name: 'AddTask',
-    data () {
+    name: "AddTask",
+    data() {
         return {
-            text: '',
-            day: '',
-            reminder: false
-        }
+            text: "",
+            day: "",
+            reminder: false,
+        };
     },
     methods: {
         onSubmit(e) {
-            e.preventDefault()
-            if(!this.text) {
-                alert('Please add a task')
-                return
+            e.preventDefault();
+            if (!this.text) {
+                alert("Please add a task");
+                return;
             }
             const newTask = {
                 id: Math.floor(Math.random() * 10000),
                 text: this.text,
                 day: this.day,
-                reminder: this.reminder
-            }
-            this.text = ''
-            this.day = ''
-            this.reminder = false
+                reminder: this.reminder,
+            };
+            this.text = "";
+            this.day = "";
+            this.reminder = false;
 
-            this.$emit('add-task', newTask)
-        }
+            this.$emit("add-task", newTask);
+        },
     },
-    emits: ['add-task']
-}
+    emits: ["add-task"],
+};
 </script>
 
 <style scoped>
@@ -77,13 +77,12 @@ export default {
     justify-content: space-between;
 }
 
-.form-control-check label{
-   flex: 1;
+.form-control-check label {
+    flex: 1;
 }
 
 .form-control input {
     flex: 2;
     height: 20px;
 }
-
 </style>
