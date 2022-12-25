@@ -47,28 +47,14 @@ export default {
         toggleAddTask() {
             this.showAddTask = !this.showAddTask;
         },
+        async fetchTasks() {
+            const res = await fetch("http://localhost:5000/tasks");
+            const data = await res.json();
+            return data;
+        },
     },
-    created() {
-        this.tasks = [
-            {
-                id: 1,
-                text: "Learn Vue",
-                day: "May 5th at 2:30pm",
-                reminder: true,
-            },
-            {
-                id: 2,
-                text: "Learn React",
-                day: "May 6th at 2:30pm",
-                reminder: true,
-            },
-            {
-                id: 3,
-                text: "Learn Angular",
-                day: "May 7th at 2:30pm",
-                reminder: true,
-            },
-        ];
+    async created() {
+        this.tasks = await this.fetchTasks();
     },
 };
 </script>
