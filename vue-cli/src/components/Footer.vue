@@ -1,7 +1,7 @@
 <template>
     <footer class="footer">
         <p>Copyright &copy; {{ new Date().getFullYear() }}</p>
-        <a href="/about">About</a>
+        <router-link to="/about">About</router-link>
     </footer>
 </template>
 
