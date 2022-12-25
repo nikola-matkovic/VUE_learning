@@ -1,9 +1,11 @@
 <template>
-    <AddTask v-if="showAddTask" @add-task="addTask" />
+    <div v-show="showAddTask">
+        <AddTask @add-task="addTask" />
+    </div>
     <Tasks
-        :tasks="tasks"
-        @delete-task="deleteTask"
         @toggle-reminder="toggleReminder"
+        @delete-task="deleteTask"
+        :tasks="tasks"
     />
 </template>
 
@@ -38,14 +40,13 @@ export default {
             this.tasks = [...this.tasks, data];
         },
         async deleteTask(id) {
-            if (confirm("Are you sure?")) {
-                const res = await fetch(`api/tasks/${id}`, {
-                    method: "DELETE",
-                });
-                res.status === 200
-                    ? (this.tasks = this.tasks.filter((task) => task.id !== id))
-                    : alert("Error deleting task");
-            }
+            if (!confirm("Are you sure?")) return;
+            const res = await fetch(`api/tasks/${id}`, {
+                method: "DELETE",
+            });
+            res.status === 200
+                ? (this.tasks = this.tasks.filter((task) => task.id !== id))
+                : alert("Error deleting task");
         },
         async toggleReminder(id) {
             const taskToToggle = await this.fetchTask(id);
