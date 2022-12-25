@@ -48,7 +48,12 @@ export default {
             this.showAddTask = !this.showAddTask;
         },
         async fetchTasks() {
-            const res = await fetch("http://localhost:5000/tasks");
+            const res = await fetch("api/tasks");
+            const data = await res.json();
+            return data;
+        },
+        async fetchTask() {
+            const res = await fetch(`api/tasks/${id}`);
             const data = await res.json();
             return data;
         },
