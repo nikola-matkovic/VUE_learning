@@ -1,19 +1,22 @@
 <template>
   <div class="container">
     <Header title="list" />
-	<Tasks :tasks="tasks" @delete-task="deleteTask" @toggle-reminder="toggleReminder"/>
+    <AddTask />
+	  <Tasks :tasks="tasks" @delete-task="deleteTask" @toggle-reminder="toggleReminder"/>
   </div>
 </template>
 
 <script>
 import Header from './components/Header.vue'
 import Tasks from './components/Tasks.vue'
+import AddTask from './components/AddTask.vue'
 
 export default {
   name: 'App',
   components: {
     Header,
-    Tasks
+    Tasks, 
+    AddTask
   },
   data() {
     return {
@@ -78,7 +81,7 @@ h1{
 
 .btn{
   display: inline-block;
-  bottom: #000;
+  background: #000;
   color: white;
   border: 0;
   padding:10px 20px;
