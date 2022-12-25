@@ -40,14 +40,19 @@ export default {
 
 body {
     font-family: "Poppins", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: linear-gradient(to bottom, #68eacc 0%, #497be8 100%);
 }
 
 .container {
-    max-width: 500px;
+    width: 500px;
     margin: 30px auto;
     overflow: hidden;
     min-height: 300px;
-    border: 1px solid steelblue;
+    border: 2px solid steelblue;
     padding: 30px;
     border-radius: 5px;
 }

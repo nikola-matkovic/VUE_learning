@@ -1,10 +1,16 @@
 {
   "tasks": [
     {
-      "text": "test 1",
-      "day": "test1",
-      "reminder": true,
+      "text": "Videti se sa Jovanom",
+      "day": "31.12.2022",
+      "reminder": false,
       "id": 1
+    },
+    {
+      "text": "Zaposliti se",
+      "day": "09.01.2023",
+      "reminder": false,
+      "id": 2
     }
   ]
 }
