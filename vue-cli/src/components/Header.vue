@@ -1,7 +1,7 @@
 <template>
     <header>
         <h1>TODO {{title}}</h1>
-        <Button text = "Add task" color="green" />
+        <Button @toggle-add-task="$emit('toggle-add-task')" text = "Add task" color="green" />
     </header>
 </template>
 
@@ -21,11 +21,10 @@ export default {
             default: 'list'
         }
     },
-
     components: {
         Button,
-    }
-
+    },
+    emits: ['toggle-add-task']
 }
 </script>
 
