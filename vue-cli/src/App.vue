@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <Header title="list" />
-    <AddTask />
+    <AddTask @add-task="addTask" />
 	  <Tasks :tasks="tasks" @delete-task="deleteTask" @toggle-reminder="toggleReminder"/>
   </div>
 </template>
@@ -30,6 +30,9 @@ export default {
     toggleReminder(id) {
       this.tasks = this.tasks
       .map((task) => task.id === id ? {...task, reminder: !task.reminder} : task)
+    },
+    addTask(task) {
+      this.tasks = [...this.tasks, task]
     }
   },
   created(){
