@@ -14,13 +14,16 @@ function convert(numberToCovnert) {
         D: 500,
         M: 1000,
     };
+
     const current = (i) => romanNumbers[numberToCovnert[i]];
     const next = (i) => romanNumbers[numberToCovnert[i + 1]];
+
     for (let i = 0; i < numberToCovnert.length; i++) {
         current(i) < next(i)
             ? (convertedNumber += next(i) - current(i++))
             : (convertedNumber += current(i));
     }
+
     return convertedNumber;
 }
 
