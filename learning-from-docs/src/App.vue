@@ -5,6 +5,7 @@ import { RouterLink, RouterView } from "vue-router";
 <template>
     <nav>
         <RouterLink to="/vbind">V-bind</RouterLink>
+        <RouterLink to="/modifilers">Modifiers</RouterLink>
     </nav>
     <RouterView />
 </template>
