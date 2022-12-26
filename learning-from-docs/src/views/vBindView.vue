@@ -7,6 +7,9 @@
             <p>Binding a style</p>
         </div>
     </main>
+    <footer>
+        <p>Follow me on github <a v-bind:[attr]="url"> Here</a></p>
+    </footer>
 </template>
 
 <script setup>
@@ -17,6 +20,9 @@ const objectOfBindings = {
         border: "1px solid black",
     },
 };
+
+let attr = "href";
+let url = "https://github.com/anonymousvegan";
 
 const objectOfBindings2 = {
     id: "div",
