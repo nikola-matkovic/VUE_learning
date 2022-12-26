@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from "vue";
 
-const text = ref("test");
+const text = ref("");
 
 function convert(numberToCovnert) {
     let convertedNumber = 0;
@@ -36,7 +36,7 @@ const arabic = computed(() => {
                 /[^IVXLCDM]{2,}|[IVXLCDM][^IVXLCDM]|[^IVXLCDM][IVXLCDM]/g
             )
         ) {
-            returnString = "Invalid input";
+            returnString = "";
             return;
         }
         if (capitalGroup.match(/[IVXLCDM]+/g)) {
@@ -49,7 +49,11 @@ const arabic = computed(() => {
 </script>
 
 <template>
-    <textarea autofocus v-model="text"></textarea>
+    <textarea
+        autofocus
+        v-model="text"
+        placeholder="Enter text with roman numbers"
+    ></textarea>
     <div class="arabic">{{ arabic }}</div>
 </template>
 
