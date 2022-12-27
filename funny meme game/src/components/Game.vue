@@ -11,7 +11,12 @@
         <div id="infos">
             <div>High Score: {{ highScore }}</div>
             <div>Score: {{ score }}</div>
-            <div>Lives: {{ lives }}</div>
+            <div class="life">
+                <img src="../assets/sljiva.webp" alt="" />
+                <div class="lifeBar">
+                    <div class="inner2" ref="inner2"></div>
+                </div>
+            </div>
         </div>
         <audio ref="bit" loop>
             <source src="../assets/8bit.mp3" type="audio/mpeg" />
@@ -34,6 +39,7 @@ const player = ref(null);
 const bit = ref(null);
 const original = ref(null);
 const inner = ref(null);
+const inner2 = ref(null);
 
 const score = ref(0);
 const highScore = ref(0);
@@ -104,7 +110,7 @@ function addLife() {
         createRakija();
         clearTimeout(lifeTimeout.value);
         addLife();
-    }, Math.random() * 3000);
+    }, Math.random() * 120000);
 }
 
 function checkHighScore() {
@@ -119,6 +125,20 @@ function movePlayer() {
     const { clientX, clientY } = event;
     const x = clientX;
     player.value.style.left = `${x}px`;
+    // check if touching any of rakijas
+    rakijas.value.forEach((rakija) => {
+        const rakijaRect = rakija.getBoundingClientRect();
+        const playerRect = player.value.getBoundingClientRect();
+        if (
+            Math.abs(rakijaRect.top - playerRect.top) > 150 ||
+            Math.abs(rakijaRect.left - playerRect.left) > 100
+        )
+            return;
+
+        rakija.remove();
+        lives.value += 1;
+        rakijas.value = rakijas.value.filter((r) => r !== rakija);
+    });
 }
 
 function setGoFastTimeout() {
@@ -196,6 +216,7 @@ function play() {
     setGoFastTimeout();
     checkHighScore();
     addLife();
+    inner2.value.style.width = `${lives.value * 10}%`;
 }
 
 function pause() {
@@ -295,6 +316,7 @@ watch(lives, () => {
     if (lives.value === 0) {
         pause();
     }
+    inner2.value.style.width = `${lives.value * 10}%`;
 });
 </script>
 
@@ -452,5 +474,34 @@ body {
     width: 125px;
     height: 125x;
     position: absolute;
+}
+
+.life {
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    width: 200px;
+    position: relative;
+}
+.life img {
+    width: 50px;
+    height: 50px;
+    z-index: 2;
+}
+.lifeBar {
+    width: 180px;
+    height: 30px;
+    position: absolute;
+    background: rgba(0, 0, 0, 0.948);
+    border-radius: 20px;
+    left: 20px;
+    top: 15px;
+}
+
+.lifeBar .inner2 {
+    width: 0px;
+    height: 30px;
+    background: rgb(106, 161, 255);
+    border-radius: 20px;
 }
 </style>
