@@ -1,0 +1,8 @@
+lives
+optimisation
+bullets switch
+control speed of bullets
+control speed of kebabs
+right click for penetrable bullet
+height score
+levels
