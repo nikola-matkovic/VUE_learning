@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import vBind from "../views/vBindView.vue";
 import Modifilers from "../views/ModifiersView.vue";
 import ComputedView from "../views/ComputedView.vue";
+import Style from "../views/StyleView.vue";
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -25,6 +26,11 @@ const router = createRouter({
             path: "/computed",
             name: "computed",
             component: ComputedView,
+        },
+        {
+            path: "/style",
+            name: "style",
+            component: Style,
         },
     ],
 });
