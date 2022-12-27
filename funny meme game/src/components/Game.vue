@@ -33,6 +33,17 @@ const ready = ref(false);
 const skipFirst = ref(true);
 const kebabs = ref([]);
 const remingBigBullet = ref(20);
+const bullets = ref([]);
+
+const intervals = ref([]);
+
+onMounted(() => {
+    document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+            shot();
+        }
+    });
+});
 
 function movePlayer() {
     if (!ready.value) return;
@@ -59,6 +70,7 @@ function createKebab() {
             kebabs.value = kebabs.value.filter((k) => k !== kebab);
         }
     }, 5);
+    intervals.value.push(interval);
 }
 
 function play() {
@@ -70,8 +82,8 @@ function play() {
         bit.value.pause();
         original.value.play();
     }
-
     let createKebabsInterval = setInterval(createKebab, 1000);
+    intervals.value.push(createKebabsInterval);
 }
 
 function pause() {
@@ -83,25 +95,40 @@ function pause() {
         bit.value.pause();
         original.value.play();
     }
+    kebabs.value.forEach((k) => k.remove());
+    kebabs.value = [];
+    intervals.value.forEach((i) => clearInterval(i));
+    intervals.value = [];
+    bullets.value.forEach((b) => b.remove());
+    bullets.value = [];
 }
 
 function shot() {
     if (!ready.value) return;
     const { clientX, clientY } = event;
-    const x = clientX;
-    const y = clientY;
+    const x = player.value.offsetLeft;
+    const y = player.value.offsetTop;
+    console.log("shot", x, y, clientX, clientY);
+
     const bullet = document.createElement("div");
-    bullet.classList.add("bullet");
+    bullets.value.push(bullet);
+
+    if (remingBigBullet.value > 0) {
+        remingBigBullet.value -= 1;
+    } else {
+        bulletSize.value = 20;
+    }
 
     if (bulletSize.value === 20) {
-        bullet.classList.add("smallBullet");
+        bullet.className = "smallBullet";
     }
     if (bulletSize.value === 50) {
-        bullet.classList.add("biggerBullet");
+        bullet.className = "biggerBullet";
     }
     if (bulletSize.value === 100) {
-        bullet.classList.add("biggestBullet");
+        bullet.className = "biggestBullet";
     }
+    bullet.classList.add("bullet");
 
     bullet.style.left = `${x}px`;
     let bulletY = "90";
@@ -114,21 +141,24 @@ function shot() {
         kebabs.value.forEach((k) => {
             let kebabRect = k.getBoundingClientRect();
             let bulletRect = bullet.getBoundingClientRect();
-            console.log();
             if (
-                Math.abs(kebabRect.top - bulletRect.top) < 45 &&
-                Math.abs(kebabRect.left - bulletRect.left) < 45
+                Math.abs(kebabRect.top - bulletRect.top) < 20 &&
+                Math.abs(kebabRect.left - bulletRect.left) <
+                    bulletSize.value + 20
             ) {
                 clearInterval(interval);
+                intervals.value = intervals.value.filter((i) => i !== interval);
+                bullets.value = bullets.value.filter((b) => b !== bullet);
                 bullet.remove();
                 k.remove();
                 kebabs.value = kebabs.value.filter((k) => k.element !== k);
                 score.value += 1;
             }
         });
-
+        intervals.value.push(interval);
         if (bulletY > window.innerHeight) {
             clearInterval(interval);
+            intervals.value = intervals.value.filter((i) => i !== interval);
             bullet.remove();
         }
     }, 5);
@@ -145,12 +175,13 @@ function shot() {
 // });
 
 watch(score, () => {
-    if (score.value % 10 === 0) {
+    if (score.value % 20 === 0) {
         bulletSize.value = 50;
-        console.log(bulletSize.value);
+        remingBigBullet.value = 3;
     }
-    if (score.value % 50 === 0) {
+    if (score.value % 100 === 0) {
         bulletSize.value = 100;
+        remingBigBullet.value = 8;
     }
     console.log("here", bulletSize.value);
 });
@@ -265,7 +296,7 @@ body {
     background: blue;
 }
 
-.bigestBullet {
+.biggestBullet {
     width: 100px;
     height: 100px;
     background: rgb(0, 0, 0);
