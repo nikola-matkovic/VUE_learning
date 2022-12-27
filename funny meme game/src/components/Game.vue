@@ -1,5 +1,10 @@
 <template>
-    <div id="game" @click="shot" @mousemove="movePlayer">
+    <div
+        id="game"
+        @click="shot('left')"
+        @contextmenu.prevent="shot('right')"
+        @mousemove="movePlayer"
+    >
         <img id="player" ref="player" src="../assets/player.png" alt="player" />
         <button v-if="!ready" @click="play" class="play">PLAY</button>
         <button v-else @click="pause" class="pause">PAUSE</button>
@@ -15,6 +20,7 @@
             <source src="../assets/original.mp3" type="audio/mpeg" />
             Your browser does not support the audio element.
         </audio>
+        <div class="goFast"><div class="inner" ref="inner"></div></div>
     </div>
 </template>
 
@@ -25,6 +31,7 @@ import kebabsImage from "../assets/kebabs.png";
 const player = ref(null);
 const bit = ref(null);
 const original = ref(null);
+const inner = ref(null);
 
 const score = ref(0);
 const lives = ref(3);
@@ -34,6 +41,7 @@ const skipFirst = ref(true);
 const kebabs = ref([]);
 const remingBigBullet = ref(20);
 const bullets = ref([]);
+const canGoFast = ref(false);
 
 const intervals = ref([]);
 
@@ -45,11 +53,39 @@ onMounted(() => {
     });
 });
 
+let goFastTimeout = null;
+
+function setBulletSize(bullet) {
+    if (remingBigBullet.value > 0) {
+        remingBigBullet.value -= 1;
+    } else {
+        bulletSize.value = 20;
+    }
+
+    if (bulletSize.value === 20) {
+        bullet.className = "smallBullet";
+    }
+    if (bulletSize.value === 50) {
+        bullet.className = "biggerBullet";
+    }
+    if (bulletSize.value === 100) {
+        bullet.className = "biggestBullet";
+    }
+}
+
 function movePlayer() {
     if (!ready.value) return;
     const { clientX, clientY } = event;
     const x = clientX;
     player.value.style.left = `${x}px`;
+}
+
+function setGoFastTimeout() {
+    inner.value.classList.add("animate");
+    goFastTimeout = setTimeout(() => {
+        console.log("i can go fast now");
+        canGoFast.value = true;
+    }, 10000);
 }
 
 function createKebab() {
@@ -75,6 +111,8 @@ function createKebab() {
 
 function play() {
     ready.value = !ready.value;
+    score.value = 0;
+    lives.value = 3;
     if (ready.value) {
         bit.value.play();
         original.value.pause();
@@ -84,6 +122,7 @@ function play() {
     }
     let createKebabsInterval = setInterval(createKebab, 1000);
     intervals.value.push(createKebabsInterval);
+    setGoFastTimeout();
 }
 
 function pause() {
@@ -103,40 +142,44 @@ function pause() {
     bullets.value = [];
 }
 
-function shot() {
+function shot(button) {
     if (!ready.value) return;
+
     const { clientX, clientY } = event;
     const x = player.value.offsetLeft;
     const y = player.value.offsetTop;
-    console.log("shot", x, y, clientX, clientY);
 
     const bullet = document.createElement("div");
     bullets.value.push(bullet);
 
-    if (remingBigBullet.value > 0) {
-        remingBigBullet.value -= 1;
-    } else {
-        bulletSize.value = 20;
-    }
+    setBulletSize(bullet);
 
-    if (bulletSize.value === 20) {
-        bullet.className = "smallBullet";
-    }
-    if (bulletSize.value === 50) {
-        bullet.className = "biggerBullet";
-    }
-    if (bulletSize.value === 100) {
-        bullet.className = "biggestBullet";
-    }
     bullet.classList.add("bullet");
 
+    let speed = 5;
+    if (button === "right" && canGoFast.value) {
+        bullet.classList.add("fast");
+        inner.value.classList.remove("animate");
+        setTimeout(() => {
+            clearTimeout(goFastTimeout);
+            setGoFastTimeout();
+        }, 1000);
+
+        speed = 10;
+    }
+
     bullet.style.left = `${x}px`;
-    let bulletY = "90";
+    let bulletY = 90;
+    function setBulletY() {
+        let newBulletY = bulletY + speed;
+        return newBulletY;
+    }
+
     bullet.style.bottom = `${bulletY}px`;
     document.body.appendChild(bullet);
     let interval = setInterval(() => {
-        bullet.style.bottom = `${bulletY++}px`;
-
+        bullet.style.bottom = `${bulletY}px`;
+        bulletY = setBulletY();
         //check if bullet hit kebab
         kebabs.value.forEach((k) => {
             let kebabRect = k.getBoundingClientRect();
@@ -161,29 +204,18 @@ function shot() {
             intervals.value = intervals.value.filter((i) => i !== interval);
             bullet.remove();
         }
-    }, 5);
+    }, 20);
 }
 
-// watch((lives) => {
-//     if (lives === 0) {
-//         ready.value = false;
-//         kebabs.value.forEach((k) => k.remove());
-//         kebabs.value = [];
-//         score.value = 0;
-//         lives.value = 3;
-//     }
-// });
-
 watch(score, () => {
-    if (score.value % 20 === 0) {
+    if (score.value % 10 === 0) {
         bulletSize.value = 50;
         remingBigBullet.value = 3;
     }
-    if (score.value % 100 === 0) {
+    if (score.value % 30 === 0) {
         bulletSize.value = 100;
         remingBigBullet.value = 8;
     }
-    console.log("here", bulletSize.value);
 });
 </script>
 
@@ -256,13 +288,6 @@ body {
     color: white;
 }
 
-.bullet {
-    position: absolute;
-    background: red;
-    border-radius: 50%;
-    animation: bullet 1s linear;
-}
-
 .kebabs {
     width: 60px;
     aspect-ratio: 1;
@@ -288,6 +313,7 @@ body {
 .smallBullet {
     width: 20px;
     height: 20px;
+    background: red;
 }
 
 .biggerBullet {
@@ -300,5 +326,46 @@ body {
     width: 100px;
     height: 100px;
     background: rgb(0, 0, 0);
+}
+
+.bullet {
+    position: absolute;
+    border-radius: 50%;
+    animation: bullet 1s linear;
+    border: 5px solid white;
+}
+
+.fast {
+    background: green;
+}
+
+.goFast {
+    width: 200px;
+    height: 20px;
+    background: rgb(0, 0, 0);
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    border-radius: 10px;
+}
+.goFast .inner {
+    width: 0;
+    height: 100%;
+    background: rgb(0, 255, 0);
+    border-radius: 10px;
+}
+
+.inner.animate {
+    animation: goFast 10s linear forwards;
+}
+
+@keyframes goFast {
+    0% {
+        width: 0;
+    }
+    100% {
+        width: 100%;
+    }
 }
 </style>
