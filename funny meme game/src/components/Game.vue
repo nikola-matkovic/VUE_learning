@@ -32,6 +32,7 @@ const bulletSize = ref(20);
 const ready = ref(false);
 const skipFirst = ref(true);
 const kebabs = ref([]);
+const remingBigBullet = ref(20);
 
 function movePlayer() {
     if (!ready.value) return;
@@ -142,6 +143,17 @@ function shot() {
 //         lives.value = 3;
 //     }
 // });
+
+watch(score, () => {
+    if (score.value % 10 === 0) {
+        bulletSize.value = 50;
+        console.log(bulletSize.value);
+    }
+    if (score.value % 50 === 0) {
+        bulletSize.value = 100;
+    }
+    console.log("here", bulletSize.value);
+});
 </script>
 
 <style>
