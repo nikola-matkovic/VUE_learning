@@ -114,7 +114,7 @@ function setGoFastTimeout() {
     goFastTimeout = setTimeout(() => {
         console.log("i can go fast now");
         canGoFast.value = true;
-    }, 10000);
+    }, 5000);
 }
 
 function createKebab() {
@@ -206,22 +206,20 @@ function shot(button) {
             let kebabRect = k.getBoundingClientRect();
             let bulletRect = bullet.getBoundingClientRect();
             if (
-                Math.abs(kebabRect.top - bulletRect.top) < 20 &&
-                Math.abs(kebabRect.left - bulletRect.left) <
+                Math.abs(kebabRect.top - bulletRect.top) > 20 ||
+                Math.abs(kebabRect.left - bulletRect.left) >
                     bulletSize.value + 20
-            ) {
-                if (!canPenetrate) {
-                    clearInterval(interval);
-                    intervals.value = intervals.value.filter(
-                        (i) => i !== interval
-                    );
-                    bullets.value = bullets.value.filter((b) => b !== bullet);
-                    bullet.remove();
-                }
-                k.remove();
-                kebabs.value = kebabs.value.filter((k) => k.element !== k);
-                score.value += 1;
+            )
+                return;
+            if (!canPenetrate) {
+                clearInterval(interval);
+                intervals.value = intervals.value.filter((i) => i !== interval);
+                bullets.value = bullets.value.filter((b) => b !== bullet);
+                bullet.remove();
             }
+            k.remove();
+            kebabs.value = kebabs.value.filter((k) => k.element !== k);
+            score.value += 1;
         });
         intervals.value.push(interval);
         if (bulletY > window.innerHeight) {
@@ -383,7 +381,7 @@ body {
 }
 
 .inner.animate {
-    animation: goFast 10s linear forwards;
+    animation: goFast 5s linear forwards;
 }
 
 @keyframes goFast {
