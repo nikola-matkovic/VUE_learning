@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
 import kebabsImage from "../assets/kebabs.png";
 
 const player = ref(null);
@@ -28,7 +28,7 @@ const original = ref(null);
 
 const score = ref(0);
 const lives = ref(3);
-
+const bulletSize = ref(20);
 const ready = ref(false);
 const skipFirst = ref(true);
 const kebabs = ref([]);
@@ -70,7 +70,7 @@ function play() {
         original.value.play();
     }
 
-    setInterval(createKebab, 1000);
+    let createKebabsInterval = setInterval(createKebab, 1000);
 }
 
 function pause() {
@@ -91,6 +91,17 @@ function shot() {
     const y = clientY;
     const bullet = document.createElement("div");
     bullet.classList.add("bullet");
+
+    if (bulletSize.value === 20) {
+        bullet.classList.add("smallBullet");
+    }
+    if (bulletSize.value === 50) {
+        bullet.classList.add("biggerBullet");
+    }
+    if (bulletSize.value === 100) {
+        bullet.classList.add("biggestBullet");
+    }
+
     bullet.style.left = `${x}px`;
     let bulletY = "90";
     bullet.style.bottom = `${bulletY}px`;
@@ -111,6 +122,7 @@ function shot() {
                 bullet.remove();
                 k.remove();
                 kebabs.value = kebabs.value.filter((k) => k.element !== k);
+                score.value += 1;
             }
         });
 
@@ -120,6 +132,16 @@ function shot() {
         }
     }, 5);
 }
+
+// watch((lives) => {
+//     if (lives === 0) {
+//         ready.value = false;
+//         kebabs.value.forEach((k) => k.remove());
+//         kebabs.value = [];
+//         score.value = 0;
+//         lives.value = 3;
+//     }
+// });
 </script>
 
 <style>
@@ -193,8 +215,6 @@ body {
 
 .bullet {
     position: absolute;
-    width: 20px;
-    height: 20px;
     background: red;
     border-radius: 50%;
     animation: bullet 1s linear;
@@ -220,5 +240,22 @@ body {
     justify-content: center;
     align-items: flex-end;
     flex-direction: column;
+}
+
+.smallBullet {
+    width: 20px;
+    height: 20px;
+}
+
+.biggerBullet {
+    width: 50px;
+    height: 50px;
+    background: blue;
+}
+
+.bigestBullet {
+    width: 100px;
+    height: 100px;
+    background: rgb(0, 0, 0);
 }
 </style>
