@@ -9,7 +9,9 @@
         <button v-if="!ready" @click="play" class="play">PLAY</button>
         <button v-else @click="pause" class="pause">PAUSE</button>
         <div id="infos">
+            <div>High Score: {{ highScore }}</div>
             <div>Score: {{ score }}</div>
+
             <div>Lives: {{ lives }}</div>
         </div>
         <audio ref="bit" loop>
@@ -34,10 +36,10 @@ const original = ref(null);
 const inner = ref(null);
 
 const score = ref(0);
+const highScore = ref(0);
 const lives = ref(3);
 const bulletSize = ref(20);
 const ready = ref(false);
-const skipFirst = ref(true);
 const kebabs = ref([]);
 const remingBigBullet = ref(20);
 const bullets = ref([]);
@@ -51,6 +53,10 @@ onMounted(() => {
             shot();
         }
     });
+    const highScoreFromStorage = localStorage.getItem("highScore");
+    if (highScoreFromStorage) {
+        highScore.value = highScoreFromStorage;
+    }
 });
 
 let goFastTimeout = null;
@@ -87,6 +93,13 @@ function setBulletSpeed(button, bullet) {
         speed = 10;
     }
     return speed;
+}
+
+function checkHighScore() {
+    if (score.value > highScore.value) {
+        highScore.value = score.value;
+        localStorage.setItem("highScore", highScore.value);
+    }
 }
 
 function movePlayer() {
@@ -139,6 +152,7 @@ function play() {
     let createKebabsInterval = setInterval(createKebab, 1000);
     intervals.value.push(createKebabsInterval);
     setGoFastTimeout();
+    checkHighScore();
 }
 
 function pause() {
@@ -158,6 +172,7 @@ function pause() {
     bullets.value = [];
     clearTimeout(goFastTimeout);
     inner.value.classList.remove("animate");
+    checkHighScore();
 }
 
 function shot(button) {
@@ -218,6 +233,7 @@ function shot(button) {
 }
 
 watch(score, () => {
+    if (score.value === 0) return;
     if (score.value % 20 === 0) {
         bulletSize.value = 50;
         remingBigBullet.value = 3;
