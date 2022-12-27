@@ -1,5 +1,4 @@
 lives
 optimisation
 control speed of kebabs
-height score
 levels
