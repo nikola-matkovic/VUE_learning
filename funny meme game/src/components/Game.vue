@@ -11,7 +11,6 @@
         <div id="infos">
             <div>High Score: {{ highScore }}</div>
             <div>Score: {{ score }}</div>
-
             <div>Lives: {{ lives }}</div>
         </div>
         <audio ref="bit" loop>
@@ -29,6 +28,7 @@
 <script setup>
 import { ref, onMounted, watch } from "vue";
 import kebabsImage from "../assets/kebabs.png";
+import rakijaImg from "../assets/sljiva.webp";
 
 const player = ref(null);
 const bit = ref(null);
@@ -41,12 +41,15 @@ const lives = ref(3);
 const bulletSize = ref(20);
 const ready = ref(false);
 const kebabs = ref([]);
+const rakijas = ref([]);
 const remingBigBullet = ref(20);
 const bullets = ref([]);
 const canGoFast = ref(false);
 
 const intervals = ref([]);
 const kebabIntervals = ref([]);
+const rakijaIntervals = ref([]);
+const lifeTimeout = ref(null);
 
 onMounted(() => {
     document.addEventListener("keydown", (e) => {
@@ -94,6 +97,14 @@ function setBulletSpeed(button, bullet) {
         speed = 10;
     }
     return speed;
+}
+
+function addLife() {
+    lifeTimeout.value = setTimeout(() => {
+        createRakija();
+        clearTimeout(lifeTimeout.value);
+        addLife();
+    }, Math.random() * 3000);
 }
 
 function checkHighScore() {
@@ -144,6 +155,31 @@ function createKebab() {
     kebabIntervals.value.push(interval);
 }
 
+function createRakija() {
+    if (!ready.value) return;
+    const rakija = document.createElement("img");
+    rakijas.value.push(rakija);
+    rakija.classList.add("rakija");
+    rakija.src = `${rakijaImg}`;
+    rakija.style.left = `${Math.random() * (window.innerWidth - 30) - 25}px`;
+    let rakijaY = "0";
+    rakija.style.top = `${rakijaY}px`;
+    document.body.appendChild(rakija);
+    let interval = setInterval(() => {
+        rakija.style.top = `${rakijaY++}px`;
+        if (rakija > window.innerHeight) {
+            clearInterval(interval);
+            rakija.remove();
+            kebabs.value = kebabs.value.filter((k) => k !== kebab);
+            kebabIntervals.value = kebabIntervals.value.filter(
+                (k) => k !== interval
+            );
+        }
+    }, 5);
+    intervals.value.push(interval);
+    rakijaIntervals.value.push(interval);
+}
+
 function play() {
     ready.value = !ready.value;
     score.value = 0;
@@ -155,10 +191,11 @@ function play() {
         bit.value.pause();
         original.value.play();
     }
-    let createKebabsInterval = setInterval(createKebab, 50);
+    let createKebabsInterval = setInterval(createKebab, 1000);
     intervals.value.push(createKebabsInterval);
     setGoFastTimeout();
     checkHighScore();
+    addLife();
 }
 
 function pause() {
@@ -179,6 +216,11 @@ function pause() {
     clearTimeout(goFastTimeout);
     inner.value.classList.remove("animate");
     checkHighScore();
+    clearTimeout(lifeTimeout.value);
+    //clear rakijas
+    rakijaIntervals.value.forEach((i) => clearInterval(i));
+    rakijaIntervals.value = [];
+    rakijas.value.forEach((r) => r.remove());
 }
 
 function shot(button) {
@@ -251,7 +293,7 @@ watch(score, () => {
 
 watch(lives, () => {
     if (lives.value === 0) {
-        // pause();
+        pause();
     }
 });
 </script>
@@ -404,5 +446,11 @@ body {
     100% {
         width: 100%;
     }
+}
+
+.rakija {
+    width: 125px;
+    height: 125x;
+    position: absolute;
 }
 </style>
