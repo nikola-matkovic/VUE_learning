@@ -156,11 +156,13 @@ function pause() {
     intervals.value = [];
     bullets.value.forEach((b) => b.remove());
     bullets.value = [];
+    clearTimeout(goFastTimeout);
+    inner.value.classList.remove("animate");
 }
 
 function shot(button) {
     if (!ready.value) return;
-
+    if (button === "right" && !canGoFast.value) return;
     const { clientX, clientY } = event;
     const x = player.value.offsetLeft;
     const y = player.value.offsetTop;
@@ -200,14 +202,10 @@ function shot(button) {
                     );
                     bullets.value = bullets.value.filter((b) => b !== bullet);
                     bullet.remove();
-                    k.remove();
-                    kebabs.value = kebabs.value.filter((k) => k.element !== k);
-                    score.value += 1;
-                } else {
-                    k.remove();
-                    kebabs.value = kebabs.value.filter((k) => k.element !== k);
-                    score.value += 1;
                 }
+                k.remove();
+                kebabs.value = kebabs.value.filter((k) => k.element !== k);
+                score.value += 1;
             }
         });
         intervals.value.push(interval);
@@ -220,11 +218,11 @@ function shot(button) {
 }
 
 watch(score, () => {
-    if (score.value % 10 === 0) {
+    if (score.value % 20 === 0) {
         bulletSize.value = 50;
         remingBigBullet.value = 3;
     }
-    if (score.value % 30 === 0) {
+    if (score.value % 100 === 0) {
         bulletSize.value = 100;
         remingBigBullet.value = 8;
     }
