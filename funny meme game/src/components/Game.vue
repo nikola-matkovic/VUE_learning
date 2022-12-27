@@ -3,6 +3,10 @@
         <img id="player" ref="player" src="../assets/player.png" alt="player" />
         <button v-if="!ready" @click="play" class="play">PLAY</button>
         <button v-else @click="pause" class="pause">PAUSE</button>
+        <div id="infos">
+            <div>Score: {{ score }}</div>
+            <div>Lives: {{ lives }}</div>
+        </div>
         <audio ref="bit" loop>
             <source src="../assets/8bit.mp3" type="audio/mpeg" />
             Your browser does not support the audio element.
@@ -21,6 +25,9 @@ import kebabsImage from "../assets/kebabs.png";
 const player = ref(null);
 const bit = ref(null);
 const original = ref(null);
+
+const score = ref(0);
+const lives = ref(3);
 
 const ready = ref(false);
 const skipFirst = ref(true);
@@ -111,7 +118,7 @@ function shot() {
             clearInterval(interval);
             bullet.remove();
         }
-    }, 3);
+    }, 5);
 }
 </script>
 
@@ -199,5 +206,19 @@ body {
     position: absolute;
     pointer-events: none;
     user-select: none;
+}
+#infos {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 500;
+    text-shadow: 0 0 10px #000;
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    flex-direction: column;
 }
 </style>
