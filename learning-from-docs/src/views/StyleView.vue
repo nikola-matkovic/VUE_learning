@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="big-font" :class="{ red: redText, blackBG: blackBackground }">
         Lorem ipsum, dolor sit amet consectetur adipisicing elit. Nostrum,
         incidunt.
     </div>
@@ -9,17 +9,17 @@
 import { ref } from "vue";
 
 const redText = ref(true);
-const blackBackground = ref(false);
+const blackBackground = ref(true);
 </script>
 
 <style scoped>
 .big-font {
     font-size: 2rem;
 }
-.redText {
+.red {
     color: red;
 }
-.blackBackground {
+.blackBG {
     background-color: black;
 }
 </style>
