@@ -46,6 +46,7 @@ const bullets = ref([]);
 const canGoFast = ref(false);
 
 const intervals = ref([]);
+const kebabIntervals = ref([]);
 
 onMounted(() => {
     document.addEventListener("keydown", (e) => {
@@ -122,7 +123,7 @@ function createKebab() {
     const kebab = document.createElement("img");
     kebab.classList.add("kebabs");
     kebab.src = `${kebabsImage}`;
-    kebab.style.left = `${Math.random() * window.innerWidth}px`;
+    kebab.style.left = `${Math.random() * (window.innerWidth - 30) - 25}px`;
     let kebabY = "0";
     kebab.style.top = `${kebabY}px`;
     document.body.appendChild(kebab);
@@ -132,10 +133,15 @@ function createKebab() {
         if (kebabY > window.innerHeight) {
             clearInterval(interval);
             kebab.remove();
+            lives.value -= 1;
             kebabs.value = kebabs.value.filter((k) => k !== kebab);
+            kebabIntervals.value = kebabIntervals.value.filter(
+                (k) => k !== interval
+            );
         }
     }, 5);
     intervals.value.push(interval);
+    kebabIntervals.value.push(interval);
 }
 
 function play() {
@@ -149,7 +155,7 @@ function play() {
         bit.value.pause();
         original.value.play();
     }
-    let createKebabsInterval = setInterval(createKebab, 1000);
+    let createKebabsInterval = setInterval(createKebab, 50);
     intervals.value.push(createKebabsInterval);
     setGoFastTimeout();
     checkHighScore();
@@ -202,7 +208,7 @@ function shot(button) {
     let interval = setInterval(() => {
         bullet.style.bottom = `${bulletY}px`;
         bulletY = setBulletY();
-        kebabs.value.forEach((k) => {
+        kebabs.value.forEach((k, index) => {
             let kebabRect = k.getBoundingClientRect();
             let bulletRect = bullet.getBoundingClientRect();
             if (
@@ -218,6 +224,7 @@ function shot(button) {
                 bullet.remove();
             }
             k.remove();
+            clearInterval(kebabIntervals.value[index]);
             kebabs.value = kebabs.value.filter((k) => k.element !== k);
             score.value += 1;
         });
@@ -239,6 +246,12 @@ watch(score, () => {
     if (score.value % 100 === 0) {
         bulletSize.value = 100;
         remingBigBullet.value = 8;
+    }
+});
+
+watch(lives, () => {
+    if (lives.value === 0) {
+        // pause();
     }
 });
 </script>
