@@ -73,6 +73,22 @@ function setBulletSize(bullet) {
     }
 }
 
+function setBulletSpeed(button, bullet) {
+    let speed = 5;
+    if (button === "right" && canGoFast.value) {
+        canGoFast.value = false;
+        bullet.classList.add("fast");
+        inner.value.classList.remove("animate");
+        setTimeout(() => {
+            clearTimeout(goFastTimeout);
+            setGoFastTimeout();
+            inner.value.classList.add("animate");
+        }, 1000);
+        speed = 10;
+    }
+    return speed;
+}
+
 function movePlayer() {
     if (!ready.value) return;
     const { clientX, clientY } = event;
@@ -151,22 +167,11 @@ function shot(button) {
 
     const bullet = document.createElement("div");
     bullets.value.push(bullet);
-
     setBulletSize(bullet);
-
     bullet.classList.add("bullet");
 
-    let speed = 5;
-    if (button === "right" && canGoFast.value) {
-        bullet.classList.add("fast");
-        inner.value.classList.remove("animate");
-        setTimeout(() => {
-            clearTimeout(goFastTimeout);
-            setGoFastTimeout();
-        }, 1000);
-
-        speed = 10;
-    }
+    let canPenetrate = canGoFast.value && button === "right";
+    let speed = setBulletSpeed(button, bullet);
 
     bullet.style.left = `${x}px`;
     let bulletY = 90;
@@ -180,7 +185,6 @@ function shot(button) {
     let interval = setInterval(() => {
         bullet.style.bottom = `${bulletY}px`;
         bulletY = setBulletY();
-        //check if bullet hit kebab
         kebabs.value.forEach((k) => {
             let kebabRect = k.getBoundingClientRect();
             let bulletRect = bullet.getBoundingClientRect();
@@ -189,13 +193,21 @@ function shot(button) {
                 Math.abs(kebabRect.left - bulletRect.left) <
                     bulletSize.value + 20
             ) {
-                clearInterval(interval);
-                intervals.value = intervals.value.filter((i) => i !== interval);
-                bullets.value = bullets.value.filter((b) => b !== bullet);
-                bullet.remove();
-                k.remove();
-                kebabs.value = kebabs.value.filter((k) => k.element !== k);
-                score.value += 1;
+                if (!canPenetrate) {
+                    clearInterval(interval);
+                    intervals.value = intervals.value.filter(
+                        (i) => i !== interval
+                    );
+                    bullets.value = bullets.value.filter((b) => b !== bullet);
+                    bullet.remove();
+                    k.remove();
+                    kebabs.value = kebabs.value.filter((k) => k.element !== k);
+                    score.value += 1;
+                } else {
+                    k.remove();
+                    kebabs.value = kebabs.value.filter((k) => k.element !== k);
+                    score.value += 1;
+                }
             }
         });
         intervals.value.push(interval);
