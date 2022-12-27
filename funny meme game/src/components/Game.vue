@@ -56,6 +56,8 @@ const intervals = ref([]);
 const kebabIntervals = ref([]);
 const rakijaIntervals = ref([]);
 const lifeTimeout = ref(null);
+const createKebabsInterval = ref(null);
+const speedOfKebabs = ref(1000);
 
 onMounted(() => {
     document.addEventListener("keydown", (e) => {
@@ -109,8 +111,13 @@ function addLife() {
     lifeTimeout.value = setTimeout(() => {
         createRakija();
         clearTimeout(lifeTimeout.value);
+        clearInterval(createKebabsInterval);
+        createKebabsInterval.value = setInterval(() => {
+            createKebab();
+        }, speedOfKebabs.value);
+        speedOfKebabs.value -= 100;
         addLife();
-    }, Math.random() * 120000);
+    }, Math.random() * 60000);
 }
 
 function checkHighScore() {
@@ -136,7 +143,7 @@ function movePlayer() {
             return;
 
         rakija.remove();
-        lives.value += 1;
+        if (lives.value < 10) lives.value += 1;
         rakijas.value = rakijas.value.filter((r) => r !== rakija);
     });
 }
@@ -146,7 +153,7 @@ function setGoFastTimeout() {
     goFastTimeout = setTimeout(() => {
         console.log("i can go fast now");
         canGoFast.value = true;
-    }, 5000);
+    }, 2000);
 }
 
 function createKebab() {
@@ -211,8 +218,8 @@ function play() {
         bit.value.pause();
         original.value.play();
     }
-    let createKebabsInterval = setInterval(createKebab, 1000);
-    intervals.value.push(createKebabsInterval);
+    createKebabsInterval.value = setInterval(createKebab, 1000);
+    intervals.value.push(createKebabsInterval.value);
     setGoFastTimeout();
     checkHighScore();
     addLife();
@@ -220,28 +227,28 @@ function play() {
 }
 
 function pause() {
-    ready.value = !ready.value;
-    if (ready.value) {
-        bit.value.play();
-        original.value.pause();
-    } else {
-        bit.value.pause();
-        original.value.play();
-    }
-    kebabs.value.forEach((k) => k.remove());
-    kebabs.value = [];
-    intervals.value.forEach((i) => clearInterval(i));
-    intervals.value = [];
-    bullets.value.forEach((b) => b.remove());
-    bullets.value = [];
-    clearTimeout(goFastTimeout);
-    inner.value.classList.remove("animate");
-    checkHighScore();
-    clearTimeout(lifeTimeout.value);
-    //clear rakijas
-    rakijaIntervals.value.forEach((i) => clearInterval(i));
-    rakijaIntervals.value = [];
-    rakijas.value.forEach((r) => r.remove());
+    // ready.value = !ready.value;
+    // if (ready.value) {
+    //     bit.value.play();
+    //     original.value.pause();
+    // } else {
+    //     bit.value.pause();
+    //     original.value.play();
+    // }
+    // kebabs.value.forEach((k) => k.remove());
+    // kebabs.value = [];
+    // intervals.value.forEach((i) => clearInterval(i));
+    // intervals.value = [];
+    // bullets.value.forEach((b) => b.remove());
+    // bullets.value = [];
+    // clearTimeout(goFastTimeout);
+    // inner.value.classList.remove("animate");
+    // checkHighScore();
+    // clearTimeout(lifeTimeout.value);
+    // rakijaIntervals.value.forEach((i) => clearInterval(i));
+    // rakijaIntervals.value = [];
+    // rakijas.value.forEach((r) => r.remove());
+    location.reload();
 }
 
 function shot(button) {
@@ -314,6 +321,7 @@ watch(score, () => {
 
 watch(lives, () => {
     if (lives.value === 0) {
+        alert("Game Over");
         pause();
     }
     inner2.value.style.width = `${lives.value * 10}%`;
@@ -458,7 +466,7 @@ body {
 }
 
 .inner.animate {
-    animation: goFast 5s linear forwards;
+    animation: goFast 2s linear forwards;
 }
 
 @keyframes goFast {
