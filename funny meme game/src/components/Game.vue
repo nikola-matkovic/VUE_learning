@@ -58,18 +58,19 @@ const rakijaIntervals = ref([]);
 const lifeTimeout = ref(null);
 const createKebabsInterval = ref(null);
 const speedOfKebabs = ref(1000);
+const removedKebabs = ref([]);
 
-onMounted(() => {
-    document.addEventListener("keydown", (e) => {
-        if (e.code === "Space") {
-            shot();
-        }
-    });
-    const highScoreFromStorage = localStorage.getItem("highScore");
-    if (highScoreFromStorage) {
-        highScore.value = highScoreFromStorage;
-    }
-});
+// onMounted(() => {
+//     document.addEventListener("keydown", (e) => {
+//         if (e.code === "Space") {
+//             shot();
+//         }
+//     });
+//     const highScoreFromStorage = localStorage.getItem("highScore");
+//     if (highScoreFromStorage) {
+//         highScore.value = highScoreFromStorage;
+//     }
+// });
 
 let goFastTimeout = null;
 
@@ -151,7 +152,6 @@ function movePlayer() {
 function setGoFastTimeout() {
     inner.value.classList.add("animate");
     goFastTimeout = setTimeout(() => {
-        console.log("i can go fast now");
         canGoFast.value = true;
     }, 2000);
 }
@@ -293,10 +293,11 @@ function shot(button) {
                 bullets.value = bullets.value.filter((b) => b !== bullet);
                 bullet.remove();
             }
+            removedKebabs.value.push(k);
             k.remove();
+            score.value = removedKebabs.value.length;
             clearInterval(kebabIntervals.value[index]);
             kebabs.value = kebabs.value.filter((k) => k.element !== k);
-            score.value += 1;
         });
         intervals.value.push(interval);
         if (bulletY > window.innerHeight) {
