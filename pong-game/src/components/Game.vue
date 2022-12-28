@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 
 const left = ref(null);
 const right = ref(null);
@@ -23,6 +23,9 @@ let moveRightInterval = ref(0);
 let ball = ref(null);
 let leftScore = ref(0);
 let rightScore = ref(0);
+const speed = ref(10);
+const paddleSpeed = ref(10);
+const lastKey = ref("");
 
 let ballDirection = ref({
     x: 0,
@@ -49,9 +52,6 @@ const restartBall = () => {
     }
     startBall();
 };
-
-const speed = ref(10);
-const lastKey = ref("");
 
 const startBall = () => {
     let x = ball.value.offsetLeft;
@@ -93,6 +93,7 @@ const startBall = () => {
         ball.value.offsetTop + ball.value.offsetHeight > left.value.offsetTop
     ) {
         ballDirection.value.x = -ballDirection.value.x;
+        speed.value += 1;
     }
 
     // check if hit right paddle
@@ -106,6 +107,7 @@ const startBall = () => {
         ball.value.offsetTop + ball.value.offsetHeight > right.value.offsetTop
     ) {
         ballDirection.value.x = -ballDirection.value.x;
+        speed.value += 1;
     }
     setTimeout(startBall, 30);
 };
@@ -139,7 +141,7 @@ const move = (e) => {
                     return;
                 }
                 right.value.style.top = right.value.offsetTop - 5 + "px";
-            }, 20);
+            }, paddleSpeed.value);
             break;
         case "ArrowDown":
             if (moveRightInterval.value) clearInterval(moveRightInterval.value);
@@ -153,7 +155,7 @@ const move = (e) => {
                     return;
                 }
                 right.value.style.top = right.value.offsetTop + 5 + "px";
-            }, 20);
+            }, paddleSpeed.value);
             break;
         case "w":
             if (moveLeftInterval.value) clearInterval(moveLeftInterval.value);
@@ -164,7 +166,7 @@ const move = (e) => {
                     return;
                 }
                 left.value.style.top = left.value.offsetTop - 5 + "px";
-            }, 20);
+            }, paddleSpeed.value);
             break;
         case "s":
             if (moveLeftInterval.value) clearInterval(moveLeftInterval.value);
@@ -178,10 +180,14 @@ const move = (e) => {
                     return;
                 }
                 left.value.style.top = left.value.offsetTop + 5 + "px";
-            }, 20);
+            }, paddleSpeed.value);
             break;
     }
 };
+
+watch(speed, (val) => {
+    console.log(val);
+});
 
 onMounted(() => {
     const randomNumberBetween = (min, max) => {
