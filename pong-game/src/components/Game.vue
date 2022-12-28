@@ -16,7 +16,7 @@ let moveRightInterval = ref(0);
 const lastKey = ref("");
 
 const stop = (e) => {
-    let key = e.key;
+    let key = e?.key || lastKey.value;
     lastKey.value = "";
     switch (key) {
         case "ArrowUp":
@@ -38,12 +38,25 @@ const move = (e) => {
         case "ArrowUp":
             if (moveRightInterval.value) clearInterval(moveRightInterval.value);
             moveRightInterval.value = setInterval(() => {
+                if (right.value.offsetTop < 0) {
+                    right.value.style.top = 0;
+                    stop();
+                    return;
+                }
                 right.value.style.top = right.value.offsetTop - 5 + "px";
             }, 20);
             break;
         case "ArrowDown":
             if (moveRightInterval.value) clearInterval(moveRightInterval.value);
             moveRightInterval.value = setInterval(() => {
+                if (
+                    right.value.offsetTop + right.value.offsetHeight >
+                    right.value.parentElement.offsetHeight
+                ) {
+                    right.value.style.bottom = 0;
+                    stop();
+                    return;
+                }
                 right.value.style.top = right.value.offsetTop + 5 + "px";
             }, 20);
             break;
@@ -100,6 +113,5 @@ body,
     position: absolute;
     right: 10px;
     top: 50%;
-    transform: translate(0, -50%);
 }
 </style>
