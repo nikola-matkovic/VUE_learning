@@ -93,6 +93,7 @@ body,
     height: 95vmin;
     background-color: #100101;
     position: relative;
+    overflow: hidden;
 }
 
 #left {
