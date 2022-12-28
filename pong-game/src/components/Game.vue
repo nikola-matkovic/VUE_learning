@@ -8,6 +8,11 @@
             <div>:</div>
             <div class="right">{{ rightScore }}</div>
         </div>
+        <div class="mouseEnabler">
+            <button @click="mouseEnabled = !mouseEnabled">
+                {{ mouseEnabled ? "Disable" : "Enable" }} Mouse
+            </button>
+        </div>
     </div>
 </template>
 
@@ -26,6 +31,7 @@ let rightScore = ref(0);
 const speed = ref(10);
 const paddleSpeed = ref(10);
 const lastKey = ref("");
+const mouseEnabled = ref(false);
 
 let ballDirection = ref({
     x: 0,
@@ -197,6 +203,21 @@ onMounted(() => {
     };
     document.addEventListener("keydown", move);
     document.addEventListener("keyup", stop);
+    document.addEventListener("mousemove", (e) => {
+        if (!mouseEnabled.value) return;
+        if (e.clientY < 0) {
+            left.value.style.top = 0;
+            return;
+        }
+        if (
+            e.clientY + left.value.offsetHeight >
+            left.value.parentElement.offsetHeight
+        ) {
+            left.value.style.bottom = 0;
+            return;
+        }
+        left.value.style.top = e.clientY + "px";
+    });
     restartBall();
 });
 </script>
