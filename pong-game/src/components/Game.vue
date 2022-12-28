@@ -5,6 +5,7 @@
         <div ref="ball" id="ball"></div>
         <div class="score">
             <div class="leftScore">{{ leftScore }}</div>
+            <div>:</div>
             <div class="right">{{ rightScore }}</div>
         </div>
     </div>
@@ -169,6 +170,7 @@ onMounted(() => {
 </script>
 
 <style>
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=Karla:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;1,200;1,300;1,400;1,500;1,600;1,700&display=swap");
 body,
 #app {
     display: flex;
@@ -208,5 +210,20 @@ body,
     position: absolute;
     top: calc(50% - 5px);
     left: calc(50% - 5px);
+}
+
+.score {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: white;
+    width: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 20px;
+    font-size: 2rem;
+    font-family: "Inter", sans-serif;
 }
 </style>
