@@ -1,5 +1,5 @@
 <template>
-    <div class="game-container">
+    <div ref="container" class="game-container">
         <div ref="left" id="left"></div>
         <div ref="right" id="right"></div>
         <div ref="ball" id="ball"></div>
@@ -9,8 +9,8 @@
             <div class="right">{{ rightScore }}</div>
         </div>
         <div class="mouseEnabler">
-            <button @click="mouseEnabled = !mouseEnabled">
-                {{ mouseEnabled ? "Disable" : "Enable" }} Mouse
+            <button @click="enableMouse">
+                {{ mouseEnabled ? "Disable" : "Enable" }} Mouse (press space)
             </button>
         </div>
     </div>
@@ -21,6 +21,7 @@ import { onMounted, ref, watch } from "vue";
 
 const left = ref(null);
 const right = ref(null);
+const container = ref(null);
 
 let moveLeftInterval = ref(0);
 let moveRightInterval = ref(0);
@@ -37,6 +38,33 @@ let ballDirection = ref({
     x: 0,
     y: 0,
 });
+
+const enableMouse = () => {
+    mouseEnabled.value = !mouseEnabled.value;
+    if (mouseEnabled.value) {
+        document.addEventListener("mousemove", mouseMove);
+    } else {
+        document.removeEventListener("mousemove", mouseMove);
+    }
+    //hide poiner if is enabled mouse
+    container.value.style.cursor = mouseEnabled.value ? "none" : "auto";
+};
+
+const mouseMove = (e) => {
+    if (!mouseEnabled.value) return;
+    if (e.clientY < 0) {
+        left.value.style.top = 0;
+        return;
+    }
+    if (
+        e.clientY + left.value.offsetHeight >
+        left.value.parentElement.offsetHeight
+    ) {
+        left.value.style.bottom = 0;
+        return;
+    }
+    left.value.style.top = e.clientY + "px";
+};
 
 const restartBall = () => {
     ball.value.style.left = "calc(50% - 5px)";
@@ -203,20 +231,11 @@ onMounted(() => {
     };
     document.addEventListener("keydown", move);
     document.addEventListener("keyup", stop);
-    document.addEventListener("mousemove", (e) => {
-        if (!mouseEnabled.value) return;
-        if (e.clientY < 0) {
-            left.value.style.top = 0;
-            return;
+    document.addEventListener("keypress", (e) => {
+        console.log(e.keyCode);
+        if (e.keyCode == 32) {
+            enableMouse();
         }
-        if (
-            e.clientY + left.value.offsetHeight >
-            left.value.parentElement.offsetHeight
-        ) {
-            left.value.style.bottom = 0;
-            return;
-        }
-        left.value.style.top = e.clientY + "px";
     });
     restartBall();
 });
