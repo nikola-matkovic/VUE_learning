@@ -28,5 +28,17 @@ body,
     position: absolute;
     left: 10px;
     top: 0;
+    top: 50%;
+    transform: translate(0, -50%);
+}
+
+#right {
+    background: blue;
+    width: 20px;
+    height: 100px;
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translate(0, -50%);
 }
 </style>
