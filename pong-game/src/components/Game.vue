@@ -1,11 +1,50 @@
 <template>
     <div class="game-container">
-        <div id="left"></div>
-        <div id="right"></div>
+        <div ref="left" id="left"></div>
+        <div ref="right" id="right"></div>
     </div>
 </template>
 
-<script setup></script>
+<script setup>
+import { onMounted, ref } from "vue";
+
+const left = ref(null);
+const right = ref(null);
+
+let moveLeftInterval = ref(null);
+let moveRightInterval = ref(null);
+
+const move = (e) => {
+    let key = e.key;
+    switch (key) {
+        case "ArrowUp":
+            moveRightInterval = setInterval(() => {
+                right.value.style.top = right.value.offsetTop - 5 + "px";
+            }, 20);
+            break;
+        case "ArrowDown":
+            moveRightInterval = setInterval(() => {
+                right.value.style.top = right.value.offsetTop + 5 + "px";
+            }, 20);
+            break;
+        case "w":
+            moveLeftInterval = setInterval(() => {
+                left.value.style.top = left.value.offsetTop - 5 + "px";
+            }, 20);
+            break;
+        case "s":
+            moveLeftInterval = setInterval(() => {
+                left.value.style.top = left.value.offsetTop + 5 + "px";
+            }, 20);
+            break;
+    }
+};
+
+onMounted(() => {
+    document.addEventListener("keydown", move);
+    document.addEventListener("keyup", stop);
+});
+</script>
 
 <style>
 body,
