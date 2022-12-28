@@ -15,8 +15,8 @@
         </div>
         <img
             class="full-screen-image"
-            src="../assest/full-screen-round-icon.svg"
-            alt="fullScreen"
+            src="../assets/full-screen-round-icon.png"
+            alt="full Screen"
         />
     </div>
 </template>
@@ -321,5 +321,16 @@ body,
     outline: none;
     font-size: 1rem;
     padding: 10px 20px;
+}
+.full-screen-image {
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    width: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+.full-screen-image:hover {
+    transform: scale(1.2);
 }
 </style>
