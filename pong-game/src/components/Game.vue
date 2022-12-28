@@ -3,6 +3,10 @@
         <div ref="left" id="left"></div>
         <div ref="right" id="right"></div>
         <div ref="ball" id="ball"></div>
+        <div class="score">
+            <div class="leftScore">{{ leftScore }}</div>
+            <div class="right">{{ rightScore }}</div>
+        </div>
     </div>
 </template>
 
@@ -14,7 +18,72 @@ const right = ref(null);
 
 let moveLeftInterval = ref(0);
 let moveRightInterval = ref(0);
+
+let ball = ref(null);
+let leftScore = ref(0);
+let rightScore = ref(0);
+
+let ballDirection = ref({
+    x: 0,
+    y: 0,
+});
+
+const restartBall = () => {
+    ball.value.style.left = "calc(50% - 5px)";
+    ball.value.style.top = "calc(50% - 5px)";
+
+    const randomNumberBetween = (min, max) => {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    };
+    ballDirection.value = {
+        x: 0,
+        y: 0,
+    };
+    while (ballDirection.value.x <= 0.2 && ballDirection.value.x >= -0.2) {
+        const heading = randomNumberBetween(0, 2 * Math.PI);
+        ballDirection.value = {
+            x: Math.cos(heading),
+            y: Math.sin(heading),
+        };
+    }
+    startBall();
+};
+
+const speed = ref(10);
 const lastKey = ref("");
+
+const startBall = () => {
+    let x = ball.value.offsetLeft;
+    let y = ball.value.offsetTop;
+    ball.value.style.left = x + ballDirection.value.x * speed.value + "px";
+    ball.value.style.top = y + ballDirection.value.y * speed.value + "px";
+    if (ball.value.offsetTop < 0) {
+        ballDirection.value.y = -ballDirection.value.y;
+    }
+    if (
+        ball.value.offsetTop + ball.value.offsetHeight >
+        ball.value.parentElement.offsetHeight
+    ) {
+        ballDirection.value.y = -ballDirection.value.y;
+    }
+    // check if go left, add score to left
+    if (ball.value.offsetLeft < 0) {
+        rightScore.value++;
+        restartBall();
+        return;
+    }
+    // check if go right, add score to right
+    if (
+        ball.value.offsetLeft + ball.value.offsetWidth >
+        ball.value.parentElement.offsetWidth
+    ) {
+        leftScore.value++;
+        restartBall();
+        return;
+    }
+
+    setTimeout(startBall, 30);
+};
 
 const stop = (e) => {
     let key = e?.key || lastKey.value;
@@ -90,8 +159,12 @@ const move = (e) => {
 };
 
 onMounted(() => {
+    const randomNumberBetween = (min, max) => {
+        return Math.floor(Math.random() * (max - min + 1) + min);
+    };
     document.addEventListener("keydown", move);
     document.addEventListener("keyup", stop);
+    restartBall();
 });
 </script>
 
