@@ -70,6 +70,7 @@ const startBall = () => {
     // check if go left, add score to left
     if (ball.value.offsetLeft < 0) {
         rightScore.value++;
+        speed.value = 10;
         restartBall();
         return;
     }
@@ -79,6 +80,7 @@ const startBall = () => {
         ball.value.parentElement.offsetWidth
     ) {
         leftScore.value++;
+        speed.value = 10;
         restartBall();
         return;
     }
