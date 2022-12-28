@@ -63,12 +63,25 @@ const move = (e) => {
         case "w":
             if (moveLeftInterval.value) clearInterval(moveLeftInterval.value);
             moveLeftInterval.value = setInterval(() => {
+                if (left.value.offsetTop < 0) {
+                    left.value.style.top = 0;
+                    stop();
+                    return;
+                }
                 left.value.style.top = left.value.offsetTop - 5 + "px";
             }, 20);
             break;
         case "s":
             if (moveLeftInterval.value) clearInterval(moveLeftInterval.value);
             moveLeftInterval.value = setInterval(() => {
+                if (
+                    left.value.offsetTop + left.value.offsetHeight >
+                    left.value.parentElement.offsetHeight
+                ) {
+                    left.value.style.bottom = 0;
+                    stop();
+                    return;
+                }
                 left.value.style.top = left.value.offsetTop + 5 + "px";
             }, 20);
             break;
