@@ -2,6 +2,7 @@
     <div class="game-container">
         <div ref="left" id="left"></div>
         <div ref="right" id="right"></div>
+        <div ref="ball" id="ball"></div>
     </div>
 </template>
 
@@ -125,5 +126,14 @@ body,
     position: absolute;
     right: 10px;
     top: calc(50% - 50px);
+}
+
+#ball {
+    width: 10px;
+    aspect-ratio: 1;
+    background-color: white;
+    position: absolute;
+    top: calc(50% - 5px);
+    left: calc(50% - 5px);
 }
 </style>
