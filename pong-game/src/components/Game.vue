@@ -11,29 +11,51 @@ import { onMounted, ref } from "vue";
 const left = ref(null);
 const right = ref(null);
 
-let moveLeftInterval = ref(null);
-let moveRightInterval = ref(null);
+let moveLeftInterval = ref(0);
+let moveRightInterval = ref(0);
+const lastKey = ref("");
+
+const stop = (e) => {
+    let key = e.key;
+    lastKey.value = "";
+    switch (key) {
+        case "ArrowUp":
+        case "ArrowDown":
+            clearInterval(moveRightInterval.value);
+            break;
+        case "w":
+        case "s":
+            clearInterval(moveLeftInterval.value);
+            break;
+    }
+};
 
 const move = (e) => {
     let key = e.key;
+    if (key === lastKey.value) return;
+    lastKey.value = key;
     switch (key) {
         case "ArrowUp":
-            moveRightInterval = setInterval(() => {
+            if (moveRightInterval.value) clearInterval(moveRightInterval.value);
+            moveRightInterval.value = setInterval(() => {
                 right.value.style.top = right.value.offsetTop - 5 + "px";
             }, 20);
             break;
         case "ArrowDown":
-            moveRightInterval = setInterval(() => {
+            if (moveRightInterval.value) clearInterval(moveRightInterval.value);
+            moveRightInterval.value = setInterval(() => {
                 right.value.style.top = right.value.offsetTop + 5 + "px";
             }, 20);
             break;
         case "w":
-            moveLeftInterval = setInterval(() => {
+            if (moveLeftInterval.value) clearInterval(moveLeftInterval.value);
+            moveLeftInterval.value = setInterval(() => {
                 left.value.style.top = left.value.offsetTop - 5 + "px";
             }, 20);
             break;
         case "s":
-            moveLeftInterval = setInterval(() => {
+            if (moveLeftInterval.value) clearInterval(moveLeftInterval.value);
+            moveLeftInterval.value = setInterval(() => {
                 left.value.style.top = left.value.offsetTop + 5 + "px";
             }, 20);
             break;
