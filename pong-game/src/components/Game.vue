@@ -17,6 +17,7 @@
             class="full-screen-image"
             src="../assets/full-screen-round-icon.png"
             alt="full Screen"
+            ref="fullScreen"
         />
     </div>
 </template>
@@ -27,6 +28,7 @@ import { onMounted, ref, watch } from "vue";
 const left = ref(null);
 const right = ref(null);
 const container = ref(null);
+const fullScreen = ref(null);
 
 let moveLeftInterval = ref(0);
 let moveRightInterval = ref(0);
@@ -242,8 +244,17 @@ onMounted(() => {
             enableMouse();
         }
     });
+    fullScreen.value.addEventListener("click", fullScreenFunction);
     restartBall();
 });
+
+const fullScreenFunction = () => {
+    if (document.fullscreenElement) {
+        document.exitFullscreen();
+    } else {
+        document.documentElement.requestFullscreen();
+    }
+};
 </script>
 
 <style>
