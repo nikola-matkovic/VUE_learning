@@ -13,6 +13,11 @@
                 {{ mouseEnabled ? "Disable" : "Enable" }} Mouse (press space)
             </button>
         </div>
+        <img
+            class="full-screen-image"
+            src="../assest/full-screen-round-icon.svg"
+            alt="fullScreen"
+        />
     </div>
 </template>
 
@@ -248,10 +253,12 @@ body,
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    width: 100vw;
 }
 .game-container {
-    width: 95vmin;
-    height: 95vmin;
+    width: 100%;
+    height: 100%;
     background-color: #100101;
     position: relative;
     overflow: hidden;
