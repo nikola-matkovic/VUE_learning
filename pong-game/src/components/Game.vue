@@ -83,6 +83,30 @@ const startBall = () => {
         return;
     }
 
+    // check if hit left paddle
+    if (
+        ball.value.offsetLeft <
+            left.value.offsetLeft + left.value.offsetWidth &&
+        ball.value.offsetLeft + ball.value.offsetWidth >
+            left.value.offsetLeft &&
+        ball.value.offsetTop < left.value.offsetTop + left.value.offsetHeight &&
+        ball.value.offsetTop + ball.value.offsetHeight > left.value.offsetTop
+    ) {
+        ballDirection.value.x = -ballDirection.value.x;
+    }
+
+    // check if hit right paddle
+    if (
+        ball.value.offsetLeft <
+            right.value.offsetLeft + right.value.offsetWidth &&
+        ball.value.offsetLeft + ball.value.offsetWidth >
+            right.value.offsetLeft &&
+        ball.value.offsetTop <
+            right.value.offsetTop + right.value.offsetHeight &&
+        ball.value.offsetTop + ball.value.offsetHeight > right.value.offsetTop
+    ) {
+        ballDirection.value.x = -ballDirection.value.x;
+    }
     setTimeout(startBall, 30);
 };
 
