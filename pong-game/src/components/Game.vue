@@ -279,4 +279,21 @@ body,
     font-size: 2rem;
     font-family: "Inter", sans-serif;
 }
+
+.mouseEnabler {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+.mouseEnabler button {
+    border: none;
+    background-color: black;
+    color: white;
+    font-family: "Inter", sans-serif;
+    cursor: pointer;
+    outline: none;
+    font-size: 1rem;
+    padding: 10px 20px;
+}
 </style>
