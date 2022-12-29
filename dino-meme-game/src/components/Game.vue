@@ -4,8 +4,8 @@
         <img :class="imageClass" :src="image" id="player" ref="player" />
         <audio ref="audioEl" :src="audio" loop></audio>
         <img ref="bge1" :src="background" id="background1" />
-        <img v-if="burekHit" :src="burekFull" id="burek" />
-        <img v-if="mineHit" :src="mineFull" id="mine" />
+        <img class="full" v-if="burekHit" :src="burekFull" id="burek" />
+        <img class="full" v-if="mineHit" :src="mineFull" id="mine" />
     </div>
 </template>
 
@@ -18,8 +18,8 @@ import imageUp2 from "../assets/omco2.png";
 import mine from "../assets/mine.webp";
 import burek_sa_sirom from "../assets/burek_sa_sirom.png";
 import background from "../assets/background.jpg";
-// import burekFull from "../assets/burek_full.png";
-import mineFull from "../assets/mine_full.png";
+import burekFull from "../assets/burek_full.jpg";
+import mineFull from "../assets/mine_full.gif";
 
 const player = ref(null);
 const audioEl = ref(null);
@@ -47,7 +47,7 @@ const jump = () => {
     jumpTimeout.value = setTimeout(() => {
         player.value.classList.remove("jump");
         jumpTimeout.value = null;
-    }, 1000);
+    }, 2000);
 };
 
 const goDown = () => {
@@ -124,10 +124,12 @@ const createEnemy = () => {
                     if (e.classList.contains("burek")) {
                         burekHit.value = true;
                     } else {
-                        mineHit.value = false;
+                        mineHit.value = true;
                     }
-                    gameOver.value = true;
                     clearInterval(moveEnemy);
+                    setTimeout(() => {
+                        gameOver.value = true;
+                    }, 1000);
                     return;
                 }
             });
@@ -286,5 +288,9 @@ const image = computed(() =>
     height: 100% !important;
     position: absolute;
     z-index: -1;
+}
+.full {
+    width: 100%;
+    height: 100%;
 }
 </style>
