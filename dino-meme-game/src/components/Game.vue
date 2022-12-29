@@ -1,11 +1,13 @@
 <template>
     <div id="game">
         <div id="land"></div>
+        <div id="player" ref="player"></div>
     </div>
 </template>
 
 <script setup>
 import { onMounted, ref } from "vue";
+const player = ref(null);
 </script>
 
 <style>
