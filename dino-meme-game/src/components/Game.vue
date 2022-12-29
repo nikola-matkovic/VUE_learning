@@ -12,6 +12,8 @@ import audio from "../assets/crna-dvojka.mp3";
 import imageDown from "../assets/dvojka.png";
 import imageUp1 from "../assets/omco1.png";
 import imageUp2 from "../assets/omco2.png";
+import mine from "../assets/mine.webp";
+import burek_sa_sirom from "../assets/burek_sa_sirom.png";
 
 const player = ref(null);
 const audioEl = ref(null);
@@ -62,13 +64,18 @@ const createEnemy = () => {
     if (createEnemyTimeout.value) {
         clearTimeout(createEnemyTimeout.value);
     }
-    const enemy = document.createElement("div");
+    const enemy = document.createElement("img");
     enemies.value.push(enemy);
     enemy.classList.add("enemy");
     enemy.style.left = "800px";
     let enemyType = Math.floor(Math.random() * 2);
     if (enemyType === 0) {
         enemy.style.bottom = "200px";
+        enemy.src = burek_sa_sirom;
+    } else {
+        enemy.src = mine;
+        enemy.style.width = "45px";
+        enemy.style.height = "20px";
     }
     document.getElementById("game").appendChild(enemy);
     let moveEnemy = setInterval(() => {
@@ -190,13 +197,13 @@ const image = computed(() =>
 
 #land {
     width: 100%;
-    height: 40px;
+    height: 50px;
     position: absolute;
-    bottom: 100px;
+    bottom: 0px;
     background-image: linear-gradient(
         to bottom,
-        rgba(0, 128, 0, 0.783) 10%,
-        rgb(124, 35, 19) 80%
+        rgba(0, 128, 0, 0.783),
+        rgb(124, 35, 19)
     );
 }
 #player {
@@ -238,9 +245,8 @@ const image = computed(() =>
 
 #game .enemy {
     bottom: 140px;
-    width: 50px;
-    height: 20px;
-    background-color: rgb(175, 0, 0);
+    width: 70px;
+    height: 35px;
     position: absolute;
     bottom: 130px;
 }
