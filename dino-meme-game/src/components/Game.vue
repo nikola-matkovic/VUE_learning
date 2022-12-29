@@ -3,6 +3,9 @@
         <div id="land"></div>
         <img :class="imageClass" :src="image" id="player" ref="player" />
         <audio ref="audioEl" :src="audio" loop></audio>
+        <img ref="bge1" :src="background" id="background1" />
+        <img v-if="burekHit" :src="burekFull" id="burek" />
+        <img v-if="mineHit" :src="mineFull" id="mine" />
     </div>
 </template>
 
@@ -14,13 +17,22 @@ import imageUp1 from "../assets/omco1.png";
 import imageUp2 from "../assets/omco2.png";
 import mine from "../assets/mine.webp";
 import burek_sa_sirom from "../assets/burek_sa_sirom.png";
+import background from "../assets/background.jpg";
+// import burekFull from "../assets/burek_full.png";
+import mineFull from "../assets/mine_full.png";
 
 const player = ref(null);
 const audioEl = ref(null);
+const bge1 = ref(null);
+const bge2 = ref(null);
+const bgx = ref(0);
 
 let jumpTimeout = ref(null);
 let createEnemyTimeout = ref(null);
 let isDonw = ref(false);
+
+let burekHit = ref(false);
+let mineHit = ref(false);
 
 const gameOver = ref(false);
 const firstTime = ref(true);
@@ -58,6 +70,8 @@ const restart = () => {
         e.remove();
     });
     enemies.value = [];
+    burekHit.value = false;
+    mineHit.value = false;
 };
 
 const createEnemy = () => {
@@ -70,12 +84,14 @@ const createEnemy = () => {
     enemy.style.left = "800px";
     let enemyType = Math.floor(Math.random() * 2);
     if (enemyType === 0) {
-        enemy.style.bottom = "200px";
+        enemy.style.bottom = "150px";
         enemy.src = burek_sa_sirom;
+        enemy.classList.add("burek");
     } else {
         enemy.src = mine;
         enemy.style.width = "45px";
         enemy.style.height = "20px";
+        enemy.classList.add("mine");
     }
     document.getElementById("game").appendChild(enemy);
     let moveEnemy = setInterval(() => {
@@ -105,6 +121,11 @@ const createEnemy = () => {
                         top < eBottom &&
                         bottom > eTop)
                 ) {
+                    if (e.classList.contains("burek")) {
+                        burekHit.value = true;
+                    } else {
+                        mineHit.value = false;
+                    }
                     gameOver.value = true;
                     clearInterval(moveEnemy);
                     return;
@@ -156,7 +177,7 @@ onMounted(() => {
 watch(gameOver, (val) => {
     console.log(val);
     if (val) {
-        alert("Game Over");
+        // alert("Game Over");
         restart();
     }
 });
@@ -186,6 +207,7 @@ const image = computed(() =>
     display: flex;
     justify-content: center;
     align-items: center;
+    padding: 20px;
 }
 
 #game {
@@ -193,6 +215,8 @@ const image = computed(() =>
     width: 800px;
     height: 600px;
     position: relative;
+    background-size: cover;
+    background-position: 0 0;
 }
 
 #land {
@@ -208,7 +232,7 @@ const image = computed(() =>
 }
 #player {
     position: absolute;
-    bottom: 130px;
+    bottom: 50px;
     left: 50px;
     display: block;
 }
@@ -244,14 +268,23 @@ const image = computed(() =>
 }
 
 #game .enemy {
-    bottom: 140px;
     width: 70px;
     height: 35px;
     position: absolute;
-    bottom: 130px;
+    bottom: 45px;
 }
 
 #game #player.down {
     height: 50px;
+}
+
+* {
+    overflow: hidden;
+}
+
+#background1 {
+    height: 100% !important;
+    position: absolute;
+    z-index: -1;
 }
 </style>
