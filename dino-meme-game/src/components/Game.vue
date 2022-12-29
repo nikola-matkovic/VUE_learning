@@ -7,12 +7,20 @@ import { onMounted, ref } from "vue";
 </script>
 
 <style>
-#app,
-#game {
-    width: 100%;
-    height: 100%;
+#app {
+    width: 100vw;
+    height: 100vh;
     margin: 0;
     padding: 0;
     overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+#game {
+    border: 1px solid #000;
+    width: 800px;
+    height: 600px;
 }
 </style>
