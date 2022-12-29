@@ -19,7 +19,7 @@ const jump = () => {
     jumpTimeout.value = setTimeout(() => {
         player.value.classList.remove("jump");
         jumpTimeout.value = null;
-    }, 1500);
+    }, 1000);
 };
 
 const createEnemy = () => {
@@ -36,7 +36,7 @@ const createEnemy = () => {
             x -= 10;
             enemy.style.left = `${x}px`;
         }
-    }, 100);
+    }, 50);
 };
 
 onMounted(() => {
@@ -90,29 +90,17 @@ onMounted(() => {
 }
 
 .jump {
-    animation: jump 1.5s;
-    animation-fill-mode: forwards;
-    animation-timing-function: linear;
+    animation: jump 1s linear;
 }
 
 @keyframes jump {
     0% {
         transform: translateY(0);
+        animation-timing-function: cubic-bezier(0.33333, 0.66667, 0.66667, 1);
     }
-    10% {
-        transform: translateY(-40px);
-    }
-    20% {
-        transform: translateY(-70px);
-    }
-    50% {
+    69.0983% {
         transform: translateY(-100px);
-    }
-    80% {
-        transform: translateY(-70px);
-    }
-    90% {
-        transform: translateY(-40px);
+        animation-timing-function: cubic-bezier(0.33333, 0, 0.66667, 0.33333);
     }
     100% {
         transform: translateY(0);
@@ -121,8 +109,8 @@ onMounted(() => {
 
 #game .enemy {
     bottom: 140px;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     background-color: #000;
     position: absolute;
     bottom: 140px;
