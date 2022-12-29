@@ -6,9 +6,10 @@
 </template>
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 const player = ref(null);
 let jumpTimeout = ref(null);
+let createEnemyTimeout = ref(null);
 let isDonw = ref(false);
 
 const gameOver = ref(false);
@@ -44,7 +45,19 @@ const removeDown = () => {
     isDonw.value = false;
 };
 
+const restart = () => {
+    gameOver.value = false;
+    firstTime.value = true;
+    enemies.value.forEach((e) => {
+        e.remove();
+    });
+    enemies.value = [];
+};
+
 const createEnemy = () => {
+    if (createEnemyTimeout.value) {
+        clearTimeout(createEnemyTimeout.value);
+    }
     const enemy = document.createElement("div");
     enemies.value.push(enemy);
     enemy.classList.add("enemy");
@@ -82,12 +95,15 @@ const createEnemy = () => {
     }, 25);
     if (gameOver.value) {
         clearInterval(moveEnemy);
+        clearTimeout(createEnemyTimeout.value);
+        createEnemyTimeout.value = null;
         return;
+    } else {
+        let min = 1000;
+        let max = 3000;
+        let time = Math.floor(Math.random() * (max - min + 1)) + min;
+        createEnemyTimeout.value = setTimeout(createEnemy, time);
     }
-    let min = 1000;
-    let max = 3000;
-    let time = Math.floor(Math.random() * (max - min + 1)) + min;
-    setTimeout(createEnemy, time);
 };
 
 onMounted(() => {
@@ -95,18 +111,13 @@ onMounted(() => {
         if (e.key === " " || e.key === "ArrowUp") {
             jump();
             if (firstTime.value) {
-                createEnemy();
+                createEnemyTimeout.value = setTimeout(createEnemy, 1000); //start the game
                 firstTime.value = false;
             }
             return;
         }
         if (e.key === "r") {
-            gameOver.value = false;
-            firstTime.value = true;
-            enemies.value.forEach((e) => {
-                e.remove();
-            });
-            enemies.value = [];
+            restart();
             return;
         }
         if (e.key === "ArrowDown" || e.key === "s") {
@@ -118,6 +129,14 @@ onMounted(() => {
             removeDown();
         }
     });
+});
+
+watch(gameOver, (val) => {
+    console.log(val);
+    if (val) {
+        alert("Game Over");
+        restart();
+    }
 });
 </script>
 
