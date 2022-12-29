@@ -8,7 +8,10 @@
         <img ref="bge1" :src="background" id="background1" />
         <img class="full" v-if="burekHit" :src="burekFull" id="burek" />
         <img class="full" v-if="mineHit" :src="mineFull" id="mine" />
-        <div ref="scoreElement">Score: {{ score }}</div>
+        <div class="score" ref="scoreElement">Score: {{ score }}</div>
+        <div class="score" ref="highScoreElement">
+            high score: {{ highScore }}
+        </div>
     </div>
 </template>
 
@@ -31,11 +34,13 @@ const explosionAudio = ref(null);
 const player = ref(null);
 const audioEl = ref(null);
 const scoreElement = ref(0);
+const highScoreElement = ref(0);
+
 const bge1 = ref(null);
 const bge2 = ref(null);
 const bgx = ref(0);
-
 const score = ref(0);
+const highScore = ref(0);
 let jumpTimeout = ref(null);
 let createEnemyTimeout = ref(null);
 let scoreInterval = ref(null);
@@ -79,10 +84,12 @@ const restart = () => {
     enemies.value.forEach((e) => {
         e.remove();
     });
+    highScore.value = localStorage.getItem("highScore") || 0;
     enemies.value = [];
     burekHit.value = false;
     mineHit.value = false;
     score.value = 0;
+    clearInterval(createEnemyTimeout.value);
 };
 
 const createEnemy = () => {
@@ -190,12 +197,18 @@ onMounted(() => {
     scoreInterval.value = setInterval(() => {
         score.value++;
     }, 1000);
+    highScore.value = localStorage.getItem("highScore") || 0;
 });
 
 watch(gameOver, (val) => {
     console.log(val);
     if (val) {
         // alert("Game Over");
+        // check if score is higher than highscore
+        if (score.value > highScore.value) {
+            highScore.value = score.value;
+            localStorage.setItem("highScore", highScore.value);
+        }
         restart();
     }
 });
@@ -308,5 +321,9 @@ const image = computed(() =>
 .full {
     width: 100%;
     height: 100%;
+}
+
+.score {
+    font-size: 25px;
 }
 </style>
