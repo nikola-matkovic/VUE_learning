@@ -8,19 +8,24 @@
 <script setup>
 import { onMounted, ref } from "vue";
 const player = ref(null);
+let jumpTimeout = ref(null);
 
 const jump = () => {
+    //allow to jump only once
+    if (jumpTimeout.value) {
+        return;
+    }
     player.value.classList.add("jump");
-    setTimeout(() => {
+    jumpTimeout.value = setTimeout(() => {
         player.value.classList.remove("jump");
-    }, 1000);
+        jumpTimeout.value = null;
+    }, 1500);
 };
 
 const createEnemy = () => {
     const enemy = document.createElement("div");
     enemy.classList.add("enemy");
-    enemy.style.left = "1000px";
-    enemy.style.bottom = `${Math.random() * 100 + 100}px`;
+    enemy.style.left = "800px";
     document.getElementById("game").appendChild(enemy);
     let moveEnemy = setInterval(() => {
         let x = parseInt(enemy.style.left);
@@ -39,9 +44,9 @@ onMounted(() => {
     window.addEventListener("keydown", (e) => {
         if (e.key === " " || e.key === "arrowup") {
             jump();
-            createEnemy();
         }
     });
+    createEnemy();
 });
 </script>
 
@@ -85,20 +90,41 @@ onMounted(() => {
 }
 
 .jump {
-    animation: jump 1s;
+    animation: jump 1.5s;
     animation-fill-mode: forwards;
-    animation-timing-function: ease-in-out;
+    animation-timing-function: linear;
 }
 
 @keyframes jump {
     0% {
         transform: translateY(0);
     }
+    10% {
+        transform: translateY(-40px);
+    }
+    20% {
+        transform: translateY(-70px);
+    }
     50% {
         transform: translateY(-100px);
+    }
+    80% {
+        transform: translateY(-70px);
+    }
+    90% {
+        transform: translateY(-40px);
     }
     100% {
         transform: translateY(0);
     }
+}
+
+#game .enemy {
+    bottom: 140px;
+    width: 60px;
+    height: 60px;
+    background-color: #000;
+    position: absolute;
+    bottom: 140px;
 }
 </style>
