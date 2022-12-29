@@ -8,6 +8,22 @@
 <script setup>
 import { onMounted, ref } from "vue";
 const player = ref(null);
+
+const jump = () => {
+    player.value.classList.add("jump");
+    setTimeout(() => {
+        player.value.classList.remove("jump");
+    }, 1000);
+};
+
+onMounted(() => {
+    // add event listener for keydown event for jumping
+    window.addEventListener("keydown", (e) => {
+        if (e.key === " " || e.key === "arrowup") {
+            jump();
+        }
+    });
+});
 </script>
 
 <style>
@@ -47,5 +63,23 @@ const player = ref(null);
     position: absolute;
     bottom: 140px;
     left: 50px;
+}
+
+.jump {
+    animation: jump 1s;
+    animation-fill-mode: forwards;
+    animation-timing-function: ease-in-out;
+}
+
+@keyframes jump {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-100px);
+    }
+    100% {
+        transform: translateY(0);
+    }
 }
 </style>
