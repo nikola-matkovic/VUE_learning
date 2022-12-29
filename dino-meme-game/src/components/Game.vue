@@ -18,6 +18,9 @@ const jump = () => {
     if (jumpTimeout.value) {
         return;
     }
+    if (gameOver.value) {
+        return;
+    }
     player.value.classList.add("jump");
     jumpTimeout.value = setTimeout(() => {
         player.value.classList.remove("jump");
@@ -79,6 +82,14 @@ onMounted(() => {
                 createEnemy();
                 firstTime.value = false;
             }
+        }
+        if (e.key === "r") {
+            gameOver.value = false;
+            firstTime.value = true;
+            enemies.value.forEach((e) => {
+                e.remove();
+            });
+            enemies.value = [];
         }
     });
 });
