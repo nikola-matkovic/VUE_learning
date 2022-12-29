@@ -40,4 +40,12 @@ const player = ref(null);
         rgb(124, 35, 19) 80%
     );
 }
+#player {
+    width: 50px;
+    height: 80px;
+    background-color: #000;
+    position: absolute;
+    bottom: 140px;
+    left: 50px;
+}
 </style>
