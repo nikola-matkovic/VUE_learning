@@ -11,6 +11,7 @@ const player = ref(null);
 let jumpTimeout = ref(null);
 const gameOver = ref(false);
 const firstTime = ref(true);
+const enemies = ref([]);
 
 const jump = () => {
     //allow to jump only once
@@ -26,15 +27,36 @@ const jump = () => {
 
 const createEnemy = () => {
     const enemy = document.createElement("div");
+    enemies.value.push(enemy);
     enemy.classList.add("enemy");
     enemy.style.left = "800px";
+    let enemyType = Math.floor(Math.random() * 2);
+    if (enemyType === 0) {
+        enemy.style.bottom = "200px";
+    }
     document.getElementById("game").appendChild(enemy);
     let moveEnemy = setInterval(() => {
         let x = parseInt(enemy.style.left);
         if (x < -60) {
+            enemies.value = enemies.value.filter((e) => e !== enemy);
             enemy.remove();
             clearInterval(moveEnemy);
         } else {
+            let playerRect = player.value.getBoundingClientRect();
+            let { left, top } = playerRect;
+            enemies.value.forEach((e) => {
+                let enemyRect = e.getBoundingClientRect();
+                if (
+                    enemyRect.left < left + 50 &&
+                    enemyRect.left + 50 > left &&
+                    enemyRect.top < top + 80 &&
+                    enemyRect.top + 20 > top
+                ) {
+                    gameOver.value = true;
+                    clearInterval(moveEnemy);
+                    return;
+                }
+            });
             x -= 5;
             enemy.style.left = `${x}px`;
         }
@@ -43,11 +65,13 @@ const createEnemy = () => {
         clearInterval(moveEnemy);
         return;
     }
-    setTimeout(createEnemy, 2000);
+    let min = 1000;
+    let max = 3000;
+    let time = Math.floor(Math.random() * (max - min + 1)) + min;
+    setTimeout(createEnemy, time);
 };
 
 onMounted(() => {
-    // add event listener for keydown event for jumping
     window.addEventListener("keydown", (e) => {
         if (e.key === " " || e.key === "arrowup") {
             jump();
