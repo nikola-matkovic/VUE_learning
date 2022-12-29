@@ -5,10 +5,10 @@
         <audio ref="audioEl" :src="audio" loop></audio>
         <audio ref="slapAudio" :src="slap"></audio>
         <audio ref="explosionAudio" :src="explosion"></audio>
-
         <img ref="bge1" :src="background" id="background1" />
         <img class="full" v-if="burekHit" :src="burekFull" id="burek" />
         <img class="full" v-if="mineHit" :src="mineFull" id="mine" />
+        <div ref="scoreElement">Score: {{ score }}</div>
     </div>
 </template>
 
@@ -30,12 +30,15 @@ const slapAudio = ref(null);
 const explosionAudio = ref(null);
 const player = ref(null);
 const audioEl = ref(null);
+const scoreElement = ref(0);
 const bge1 = ref(null);
 const bge2 = ref(null);
 const bgx = ref(0);
 
+const score = ref(0);
 let jumpTimeout = ref(null);
 let createEnemyTimeout = ref(null);
+let scoreInterval = ref(null);
 let isDonw = ref(false);
 
 let burekHit = ref(false);
@@ -79,6 +82,7 @@ const restart = () => {
     enemies.value = [];
     burekHit.value = false;
     mineHit.value = false;
+    score.value = 0;
 };
 
 const createEnemy = () => {
@@ -183,6 +187,9 @@ onMounted(() => {
             removeDown();
         }
     });
+    scoreInterval.value = setInterval(() => {
+        score.value++;
+    }, 1000);
 });
 
 watch(gameOver, (val) => {
