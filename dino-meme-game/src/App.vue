@@ -10,6 +10,7 @@ import Game from "./components/Game.vue";
     padding: 0;
     box-sizing: border-box;
     font-family: inherit;
+    overflow: hidden;
 }
 
 body {
