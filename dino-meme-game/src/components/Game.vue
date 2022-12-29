@@ -16,11 +16,30 @@ const jump = () => {
     }, 1000);
 };
 
+const createEnemy = () => {
+    const enemy = document.createElement("div");
+    enemy.classList.add("enemy");
+    enemy.style.left = "1000px";
+    enemy.style.bottom = `${Math.random() * 100 + 100}px`;
+    document.getElementById("game").appendChild(enemy);
+    let moveEnemy = setInterval(() => {
+        let x = parseInt(enemy.style.left);
+        if (x < -60) {
+            enemy.remove();
+            clearInterval(moveEnemy);
+        } else {
+            x -= 10;
+            enemy.style.left = `${x}px`;
+        }
+    }, 100);
+};
+
 onMounted(() => {
     // add event listener for keydown event for jumping
     window.addEventListener("keydown", (e) => {
         if (e.key === " " || e.key === "arrowup") {
             jump();
+            createEnemy();
         }
     });
 });
