@@ -1,13 +1,21 @@
 <template>
     <div id="game">
         <div id="land"></div>
-        <div id="player" ref="player"></div>
+        <img :class="imageClass" :src="image" id="player" ref="player" />
+        <audio ref="audioEl" :src="audio" loop></audio>
     </div>
 </template>
 
 <script setup>
-import { onMounted, ref, watch } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
+import audio from "../assets/crna-dvojka.mp3";
+import imageDown from "../assets/dvojka.png";
+import imageUp1 from "../assets/omco1.png";
+import imageUp2 from "../assets/omco2.png";
+
 const player = ref(null);
+const audioEl = ref(null);
+
 let jumpTimeout = ref(null);
 let createEnemyTimeout = ref(null);
 let isDonw = ref(false);
@@ -34,10 +42,6 @@ const goDown = () => {
     }
     isDonw.value = true;
     player.value.classList.add("down");
-    goDownTimeout.value = setTimeout(() => {
-        player.value.classList.remove("down");
-        goDownTimeout.value = null;
-    }, 1000);
 };
 
 const removeDown = () => {
@@ -75,14 +79,24 @@ const createEnemy = () => {
             clearInterval(moveEnemy);
         } else {
             let playerRect = player.value.getBoundingClientRect();
-            let { left, top } = playerRect;
+            let { left, top, bottom, right } = playerRect;
             enemies.value.forEach((e) => {
                 let enemyRect = e.getBoundingClientRect();
+                let {
+                    left: eLeft,
+                    top: eTop,
+                    bottom: eBottom,
+                    right: eRight,
+                } = enemyRect;
                 if (
-                    enemyRect.left < left + 50 &&
-                    enemyRect.left + 50 > left &&
-                    enemyRect.top < top + 80 &&
-                    enemyRect.top + 20 > top
+                    (left < eRight &&
+                        right > eLeft &&
+                        top < eBottom &&
+                        bottom > eTop) ||
+                    (left < eRight &&
+                        right > eLeft &&
+                        top < eBottom &&
+                        bottom > eTop)
                 ) {
                     gameOver.value = true;
                     clearInterval(moveEnemy);
@@ -108,6 +122,7 @@ const createEnemy = () => {
 
 onMounted(() => {
     window.addEventListener("keydown", (e) => {
+        audioEl.value.play();
         if (e.key === " " || e.key === "ArrowUp") {
             jump();
             if (firstTime.value) {
@@ -138,6 +153,20 @@ watch(gameOver, (val) => {
         restart();
     }
 });
+
+const imageClass = computed(() => {
+    if (isDonw.value) {
+        return "golf";
+    }
+    if (jumpTimeout.value) {
+        return "omco1 jump";
+    }
+    return "omco2";
+});
+
+const image = computed(() =>
+    isDonw.value ? imageDown : jumpTimeout.value ? imageUp2 : imageUp1
+);
 </script>
 
 <style>
@@ -171,12 +200,22 @@ watch(gameOver, (val) => {
     );
 }
 #player {
-    width: 50px;
-    height: 80px;
-    background-color: #000;
     position: absolute;
-    bottom: 140px;
+    bottom: 130px;
     left: 50px;
+    display: block;
+}
+.omco1 {
+    height: 150px;
+    width: 75px;
+}
+.omco2 {
+    height: 150px;
+    width: 75px;
+}
+.golf {
+    height: 50px;
+    width: auto;
 }
 
 .jump {
