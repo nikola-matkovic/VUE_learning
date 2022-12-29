@@ -79,6 +79,11 @@ const removeDown = () => {
 };
 
 const restart = () => {
+    if (scoreInterval.value) {
+        clearInterval(scoreInterval.value);
+        scoreInterval.value = null;
+    }
+
     gameOver.value = false;
     firstTime.value = true;
     enemies.value.forEach((e) => {
@@ -173,6 +178,11 @@ const createEnemy = () => {
 onMounted(() => {
     window.addEventListener("keydown", (e) => {
         audioEl.value.play();
+        if (!scoreInterval.value) {
+            scoreInterval.value = setInterval(() => {
+                score.value++;
+            }, 1000);
+        }
         if (e.key === " " || e.key === "ArrowUp") {
             jump();
             if (firstTime.value) {
@@ -194,10 +204,8 @@ onMounted(() => {
             removeDown();
         }
     });
-    scoreInterval.value = setInterval(() => {
-        score.value++;
-    }, 1000);
     highScore.value = localStorage.getItem("highScore") || 0;
+    restart();
 });
 
 watch(gameOver, (val) => {
