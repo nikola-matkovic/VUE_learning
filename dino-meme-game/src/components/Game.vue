@@ -9,6 +9,8 @@
 import { onMounted, ref } from "vue";
 const player = ref(null);
 let jumpTimeout = ref(null);
+const gameOver = ref(false);
+const firstTime = ref(true);
 
 const jump = () => {
     //allow to jump only once
@@ -33,10 +35,15 @@ const createEnemy = () => {
             enemy.remove();
             clearInterval(moveEnemy);
         } else {
-            x -= 10;
+            x -= 5;
             enemy.style.left = `${x}px`;
         }
-    }, 50);
+    }, 25);
+    if (gameOver.value) {
+        clearInterval(moveEnemy);
+        return;
+    }
+    setTimeout(createEnemy, 2000);
 };
 
 onMounted(() => {
@@ -44,9 +51,12 @@ onMounted(() => {
     window.addEventListener("keydown", (e) => {
         if (e.key === " " || e.key === "arrowup") {
             jump();
+            if (firstTime.value) {
+                createEnemy();
+                firstTime.value = false;
+            }
         }
     });
-    createEnemy();
 });
 </script>
 
@@ -98,8 +108,8 @@ onMounted(() => {
         transform: translateY(0);
         animation-timing-function: cubic-bezier(0.33333, 0.66667, 0.66667, 1);
     }
-    69.0983% {
-        transform: translateY(-100px);
+    50% {
+        transform: translateY(-125px);
         animation-timing-function: cubic-bezier(0.33333, 0, 0.66667, 0.33333);
     }
     100% {
@@ -110,9 +120,9 @@ onMounted(() => {
 #game .enemy {
     bottom: 140px;
     width: 50px;
-    height: 50px;
-    background-color: #000;
+    height: 20px;
+    background-color: rgb(175, 0, 0);
     position: absolute;
-    bottom: 140px;
+    bottom: 130px;
 }
 </style>
