@@ -9,16 +9,15 @@
 import { onMounted, ref } from "vue";
 const player = ref(null);
 let jumpTimeout = ref(null);
+let isDonw = ref(false);
+
 const gameOver = ref(false);
 const firstTime = ref(true);
 const enemies = ref([]);
 
 const jump = () => {
     //allow to jump only once
-    if (jumpTimeout.value) {
-        return;
-    }
-    if (gameOver.value) {
+    if (jumpTimeout.value || gameOver.value || isDonw.value) {
         return;
     }
     player.value.classList.add("jump");
@@ -26,6 +25,23 @@ const jump = () => {
         player.value.classList.remove("jump");
         jumpTimeout.value = null;
     }, 1000);
+};
+
+const goDown = () => {
+    if (jumpTimeout.value || isDonw.value || gameOver.value) {
+        return;
+    }
+    isDonw.value = true;
+    player.value.classList.add("down");
+    goDownTimeout.value = setTimeout(() => {
+        player.value.classList.remove("down");
+        goDownTimeout.value = null;
+    }, 1000);
+};
+
+const removeDown = () => {
+    player.value.classList.remove("down");
+    isDonw.value = false;
 };
 
 const createEnemy = () => {
@@ -76,12 +92,13 @@ const createEnemy = () => {
 
 onMounted(() => {
     window.addEventListener("keydown", (e) => {
-        if (e.key === " " || e.key === "arrowup") {
+        if (e.key === " " || e.key === "ArrowUp") {
             jump();
             if (firstTime.value) {
                 createEnemy();
                 firstTime.value = false;
             }
+            return;
         }
         if (e.key === "r") {
             gameOver.value = false;
@@ -90,6 +107,15 @@ onMounted(() => {
                 e.remove();
             });
             enemies.value = [];
+            return;
+        }
+        if (e.key === "ArrowDown" || e.key === "s") {
+            goDown();
+        }
+    });
+    window.addEventListener("keyup", (e) => {
+        if (e.key === "ArrowDown" || e.key === "s") {
+            removeDown();
         }
     });
 });
@@ -159,5 +185,9 @@ onMounted(() => {
     background-color: rgb(175, 0, 0);
     position: absolute;
     bottom: 130px;
+}
+
+#game #player.down {
+    height: 50px;
 }
 </style>
