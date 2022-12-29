@@ -3,6 +3,9 @@
         <div id="land"></div>
         <img :class="imageClass" :src="image" id="player" ref="player" />
         <audio ref="audioEl" :src="audio" loop></audio>
+        <audio ref="slapAudio" :src="slap"></audio>
+        <audio ref="explosionAudio" :src="explosion"></audio>
+
         <img ref="bge1" :src="background" id="background1" />
         <img class="full" v-if="burekHit" :src="burekFull" id="burek" />
         <img class="full" v-if="mineHit" :src="mineFull" id="mine" />
@@ -20,7 +23,11 @@ import burek_sa_sirom from "../assets/burek_sa_sirom.png";
 import background from "../assets/background.jpg";
 import burekFull from "../assets/burek_full.jpg";
 import mineFull from "../assets/mine_full.gif";
+import slap from "../assets/slap.mp3";
+import explosion from "../assets/explosion.mp3";
 
+const slapAudio = ref(null);
+const explosionAudio = ref(null);
 const player = ref(null);
 const audioEl = ref(null);
 const bge1 = ref(null);
@@ -123,8 +130,10 @@ const createEnemy = () => {
                 ) {
                     if (e.classList.contains("burek")) {
                         burekHit.value = true;
+                        slapAudio.value.play();
                     } else {
                         mineHit.value = true;
+                        explosionAudio.value.play();
                     }
                     clearInterval(moveEnemy);
                     setTimeout(() => {
