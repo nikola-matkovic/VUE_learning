@@ -54,7 +54,7 @@ const jump = () => {
     jumpTimeout.value = setTimeout(() => {
         player.value.classList.remove("jump");
         jumpTimeout.value = null;
-    }, 2000);
+    }, 1000);
 };
 
 const goDown = () => {
