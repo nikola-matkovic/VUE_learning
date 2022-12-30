@@ -53,7 +53,12 @@ const gameOver = ref(false);
 const firstTime = ref(true);
 const enemies = ref([]);
 
+const speed = () => Math.floor(score.value / 5) + 8;
+
 const jump = () => {
+    let animationSpeed = 1000 - speed() * 25;
+    let root = document.querySelector(":root");
+    root.style.setProperty("--speed", animationSpeed + "ms");
     //allow to jump only once
     if (jumpTimeout.value || gameOver.value || isDonw.value) {
         return;
@@ -62,7 +67,7 @@ const jump = () => {
     jumpTimeout.value = setTimeout(() => {
         player.value.classList.remove("jump");
         jumpTimeout.value = null;
-    }, 1000);
+    }, animationSpeed);
 };
 
 const goDown = () => {
@@ -158,7 +163,8 @@ const createEnemy = () => {
                     return;
                 }
             });
-            x -= 5;
+            x -= speed();
+            console.log(speed());
             enemy.style.left = `${x}px`;
         }
     }, 25);
@@ -168,8 +174,8 @@ const createEnemy = () => {
         createEnemyTimeout.value = null;
         return;
     } else {
-        let min = 1000;
-        let max = 3000;
+        let min = 1000 - speed() * 10;
+        let max = 3500 - speed() * 250;
         let time = Math.floor(Math.random() * (max - min + 1)) + min;
         createEnemyTimeout.value = setTimeout(createEnemy, time);
     }
@@ -209,10 +215,7 @@ onMounted(() => {
 });
 
 watch(gameOver, (val) => {
-    console.log(val);
     if (val) {
-        // alert("Game Over");
-        // check if score is higher than highscore
         if (score.value > highScore.value) {
             highScore.value = score.value;
             localStorage.setItem("highScore", highScore.value);
@@ -237,6 +240,9 @@ const image = computed(() =>
 </script>
 
 <style>
+:root {
+    --speed: 1s;
+}
 #app {
     width: 100vw;
     height: 100vh;
@@ -289,7 +295,7 @@ const image = computed(() =>
 }
 
 .jump {
-    animation: jump 1s linear;
+    animation: jump var(--speed) linear;
 }
 
 @keyframes jump {
