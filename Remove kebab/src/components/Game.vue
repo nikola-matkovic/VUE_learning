@@ -1,5 +1,5 @@
 <template>
-    <div id="background" :class="{playing: playing}">
+    <div id="background">
         <div id="game"  @click="shot('primary')" @contextmenu.prevent="shot('super')" @mousemove="movePlayer">
             <img id="player" ref="player" src="../assets/player.png" alt="player" />
             <button v-if="!ready" @click="play" class="play">PLAY</button>
@@ -52,7 +52,6 @@ const bullets = ref([]);
 const canGoFast = ref(false);
 const cansShot = ref(true)
 
-const intervals = ref([]);
 const kebabIntervals = ref([]);
 const rakijaIntervals = ref([]);
 const lifeTimeout = ref(null);
@@ -63,7 +62,6 @@ const speedOfKebabs = ref(1000);
 onMounted(() => {
 
     document.addEventListener("keydown", (e) => {
-        console.log(e.code)
         if (e.code === "Space" || e.code === "3") {
             shot("primary");
         }
@@ -117,10 +115,6 @@ function addLife() {
     lifeTimeout.value = setTimeout(() => {
         createRakija();
         clearTimeout(lifeTimeout.value);
-        // clearInterval(createKebabsInterval);
-        // createKebabsInterval.value = setInterval(() => {
-        //     createKebab();
-        // }, speedOfKebabs.value);
         speedOfKebabs.value -= 100;
         addLife();
     }, Math.random() * 60000);
@@ -167,24 +161,29 @@ function createKebab() {
     kebab.classList.add("kebabs");
     kebab.src = `${kebabsImage}`;
     kebab.style.left = `${Math.random() * (window.innerWidth - 30) - 25}px`;
-    let kebabY = "0";
+    let kebabY = 0;
     kebab.style.top = `${kebabY}px`;
     document.body.appendChild(kebab);
-    kebabs.value.push(kebab);
-    let interval = setInterval(() => {
-        kebab.style.top = `${kebabY++}px`;
+
+    const kebabData = {
+        id: Date.now() + Math.random(), // Jedinstveni ID
+        element: kebab,
+        intervalId: null
+    };
+
+    const interval = setInterval(() => {
+        kebabY++;
+        kebab.style.top = `${kebabY}px`;
         if (kebabY > window.innerHeight) {
             clearInterval(interval);
             kebab.remove();
             lives.value -= 1;
-            kebabs.value = kebabs.value.filter((k) => k !== kebab);
-            kebabIntervals.value = kebabIntervals.value.filter(
-                (k) => k !== interval
-            );
+            kebabs.value = kebabs.value.filter((k) => k.id !== kebabData.id);
         }
     }, 5);
-    intervals.value.push(interval);
-    kebabIntervals.value.push(interval);
+
+    kebabData.intervalId = interval;
+    kebabs.value.push(kebabData);
 }
 
 function createRakija() {
@@ -208,7 +207,6 @@ function createRakija() {
             );
         }
     }, 5);
-    intervals.value.push(interval);
     rakijaIntervals.value.push(interval);
 }
 
@@ -224,17 +222,11 @@ function play() {
         original.value.play();
     }
     createKebabsInterval.value = setInterval(createKebab, 1000);
-    intervals.value.push(createKebabsInterval.value);
     setGoFastTimeout();
     checkHighScore();
     addLife();
     inner2.value.style.width = `${lives.value * 10}%`;
 }
-
-watch(canGoFast, (n) => {
-    console.log(n);
-
-})
 
 
 // Primary mode - normal 
@@ -250,8 +242,6 @@ function moveBullet(bullet, currentY, speed) {
 }
 
 function drawBulletToScreen(mode) {
-
-    console.log("Drawing for mode", mode)
 
     cansShot.value = false;
     const x = player.value.offsetLeft;
@@ -277,50 +267,63 @@ function drawBulletToScreen(mode) {
 }
 
 function checkForKebabCoalition(bullet, interval, canPenetrate) {
+    const bulletRect = bullet.getBoundingClientRect();
 
-    kebabs.value.forEach((k, index) => {
-        let kebabRect = k.getBoundingClientRect();
-        let bulletRect = bullet.getBoundingClientRect();
+    const kebabsToRemove = [];
+
+    for (const kebab of kebabs.value) {
+        const kebabRect = kebab.element.getBoundingClientRect();
+
         if (
-            Math.abs(kebabRect.top - bulletRect.top) > 20 ||
-            Math.abs(kebabRect.left - bulletRect.left) >
-            bulletSize.value + 20
-        )
-            return;
-        if (!canPenetrate) {
-            clearInterval(interval);
-            intervals.value = intervals.value.filter((i) => i !== interval);
-            bullets.value = bullets.value.filter((b) => b !== bullet);
-            bullet.remove();
+            Math.abs(kebabRect.top - bulletRect.top) > 50 ||
+            Math.abs(kebabRect.left - bulletRect.left) > bulletSize.value + 20
+        ) {
+            continue;
         }
-        k.remove();
-        score.value += 1
-        clearInterval(kebabIntervals.value[index]);
-        kebabs.value = kebabs.value.filter((k) => k.element !== k);
-    });
+
+        if (
+            bulletRect.left < kebabRect.right &&
+            bulletRect.right > kebabRect.left &&
+            bulletRect.top < kebabRect.bottom &&
+            bulletRect.bottom > kebabRect.top
+        ) {
+            kebabsToRemove.push(kebab);
+
+            if (!canPenetrate) {
+                clearInterval(interval);
+                bullet.remove();
+                bullets.value = bullets.value.filter((b) => b !== bullet);
+                break; 
+            }
+        }
+    }
+
+    if (kebabsToRemove.length > 0) {
+        for (const kebab of kebabsToRemove) {
+            score.value += 1;
+            kebab.element.remove();
+            clearInterval(kebab.intervalId);
+        }
+
+        const idsToRemove = new Set(kebabsToRemove.map(k => k.id));
+        kebabs.value = kebabs.value.filter(k => !idsToRemove.has(k.id));
+    }
 }
 
 function setBulletInterval(bullet, bulletY, canPenetrate, speed) {
 
-    console.log("Im in bullet interval", { bullet, bulletY, canPenetrate, speed });
-
-
     let interval = setInterval(() => {
-        bullet.style.bottom = `${bulletY}px`;
         bulletY = moveBullet(bullet, bulletY, speed);
+        bullet.style.bottom = `${bulletY}px`; 
 
-        console.log("Checking", canPenetrate)
+        checkForKebabCoalition(bullet, interval, canPenetrate);
 
-        checkForKebabCoalition(bullet, interval, canPenetrate)
-
-
-        intervals.value.push(interval);
         if (bulletY > window.innerHeight) {
             clearInterval(interval);
-            intervals.value = intervals.value.filter((i) => i !== interval);
             bullet.remove();
         }
     }, 20);
+
 }
 
 function shot(mode = "primary") {
