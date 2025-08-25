@@ -1,38 +1,37 @@
 <template>
-    <div
-        id="game"
-        @click="shot('left')"
-        @contextmenu.prevent="shot('right')"
-        @mousemove="movePlayer"
-    >
-        <img id="player" ref="player" src="../assets/player.png" alt="player" />
-        <button v-if="!ready" @click="play" class="play">PLAY</button>
-        <button v-else @click="pause" class="pause">PAUSE</button>
-        <div id="infos">
-            <div>High Score: {{ highScore }}</div>
-            <div>Score: {{ score }}</div>
-            <div class="life">
-                <img src="../assets/sljiva.webp" alt="" />
-                <div class="lifeBar">
-                    <div class="inner2" ref="inner2"></div>
+    <div id="background" :class="{playing: playing}">
+        <div id="game"  @click="shot('primary')" @contextmenu.prevent="shot('super')" @mousemove="movePlayer">
+            <img id="player" ref="player" src="../assets/player.png" alt="player" />
+            <button v-if="!ready" @click="play" class="play">PLAY</button>
+            <button v-else @click="pause" class="pause">PAUSE</button>
+            <div id="infos">
+                <div>High Score: {{ highScore }}</div>
+                <div>Score: {{ score }}</div>
+                <div class="life">
+                    <img src="../assets/sljiva.webp" alt="" />
+                    <div class="lifeBar">
+                        <div class="inner2" ref="inner2"></div>
+                    </div>
                 </div>
             </div>
+            <audio ref="bit" loop>
+                <source src="../assets/8bit.mp3" type="audio/mpeg" />
+                Your browser does not support the audio element.
+            </audio>
+            <audio ref="original" loop autoplay>
+                <source src="../assets/original.mp3" type="audio/mpeg" />
+                Your browser does not support the audio element.
+            </audio>
+            <div class="goFast">
+                <div class="inner" ref="inner"></div>
+            </div>
         </div>
-        <audio ref="bit" loop>
-            <source src="../assets/8bit.mp3" type="audio/mpeg" />
-            Your browser does not support the audio element.
-        </audio>
-        <audio ref="original" loop autoplay>
-            <source src="../assets/original.mp3" type="audio/mpeg" />
-            Your browser does not support the audio element.
-        </audio>
-        <div class="goFast"><div class="inner" ref="inner"></div></div>
     </div>
 </template>
 
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import kebabsImage from "../assets/kebabs.png";
+import kebabsImage from "../assets/kebab.webp";
 import rakijaImg from "../assets/sljiva.webp";
 
 const player = ref(null);
@@ -48,9 +47,10 @@ const bulletSize = ref(20);
 const ready = ref(false);
 const kebabs = ref([]);
 const rakijas = ref([]);
-const remingBigBullet = ref(20);
+const remainingBigBullet = ref(20);
 const bullets = ref([]);
 const canGoFast = ref(false);
+const cansShot = ref(true)
 
 const intervals = ref([]);
 const kebabIntervals = ref([]);
@@ -58,25 +58,30 @@ const rakijaIntervals = ref([]);
 const lifeTimeout = ref(null);
 const createKebabsInterval = ref(null);
 const speedOfKebabs = ref(1000);
-const removedKebabs = ref([]);
 
-// onMounted(() => {
-//     document.addEventListener("keydown", (e) => {
-//         if (e.code === "Space") {
-//             shot();
-//         }
-//     });
-//     const highScoreFromStorage = localStorage.getItem("highScore");
-//     if (highScoreFromStorage) {
-//         highScore.value = highScoreFromStorage;
-//     }
-// });
+
+onMounted(() => {
+
+    document.addEventListener("keydown", (e) => {
+        console.log(e.code)
+        if (e.code === "Space" || e.code === "3") {
+            shot("primary");
+        }
+        if (e.code === "KeyS") {
+            shot("super")
+        }
+    });
+    const highScoreFromStorage = localStorage.getItem("highScore");
+    if (highScoreFromStorage) {
+        highScore.value = highScoreFromStorage;
+    }
+});
 
 let goFastTimeout = null;
 
 function setBulletSize(bullet) {
-    if (remingBigBullet.value > 0) {
-        remingBigBullet.value -= 1;
+    if (remainingBigBullet.value > 0) {
+        remainingBigBullet.value--;
     } else {
         bulletSize.value = 20;
     }
@@ -94,8 +99,8 @@ function setBulletSize(bullet) {
 
 function setBulletSpeed(button, bullet) {
     let speed = 5;
-    if (button === "right" && canGoFast.value) {
-        canGoFast.value = false;
+    if (button === "super" && canGoFast.value) {
+
         bullet.classList.add("fast");
         inner.value.classList.remove("animate");
         setTimeout(() => {
@@ -112,10 +117,10 @@ function addLife() {
     lifeTimeout.value = setTimeout(() => {
         createRakija();
         clearTimeout(lifeTimeout.value);
-        clearInterval(createKebabsInterval);
-        createKebabsInterval.value = setInterval(() => {
-            createKebab();
-        }, speedOfKebabs.value);
+        // clearInterval(createKebabsInterval);
+        // createKebabsInterval.value = setInterval(() => {
+        //     createKebab();
+        // }, speedOfKebabs.value);
         speedOfKebabs.value -= 100;
         addLife();
     }, Math.random() * 60000);
@@ -210,7 +215,7 @@ function createRakija() {
 function play() {
     ready.value = !ready.value;
     score.value = 0;
-    lives.value = 3;
+    lives.value = 5;
     if (ready.value) {
         bit.value.play();
         original.value.pause();
@@ -226,79 +231,89 @@ function play() {
     inner2.value.style.width = `${lives.value * 10}%`;
 }
 
-function pause() {
-    // ready.value = !ready.value;
-    // if (ready.value) {
-    //     bit.value.play();
-    //     original.value.pause();
-    // } else {
-    //     bit.value.pause();
-    //     original.value.play();
-    // }
-    // kebabs.value.forEach((k) => k.remove());
-    // kebabs.value = [];
-    // intervals.value.forEach((i) => clearInterval(i));
-    // intervals.value = [];
-    // bullets.value.forEach((b) => b.remove());
-    // bullets.value = [];
-    // clearTimeout(goFastTimeout);
-    // inner.value.classList.remove("animate");
-    // checkHighScore();
-    // clearTimeout(lifeTimeout.value);
-    // rakijaIntervals.value.forEach((i) => clearInterval(i));
-    // rakijaIntervals.value = [];
-    // rakijas.value.forEach((r) => r.remove());
-    location.reload();
+watch(canGoFast, (n) => {
+    console.log(n);
+
+})
+
+
+// Primary mode - normal 
+// Supper - bullets can penetrate more then one kebab
+function moveBullet(bullet, currentY, speed) {
+
+    let newBulletY = currentY + speed;
+    bullet.style.bottom = newBulletY + "px"
+
+    bullet.style.bottom = `${newBulletY}px`;
+
+    return newBulletY
 }
 
-function shot(button) {
-    if (!ready.value) return;
-    if (button === "right" && !canGoFast.value) return;
-    const { clientX, clientY } = event;
+function drawBulletToScreen(mode) {
+
+    console.log("Drawing for mode", mode)
+
+    cansShot.value = false;
     const x = player.value.offsetLeft;
-    const y = player.value.offsetTop;
 
     const bullet = document.createElement("div");
     bullets.value.push(bullet);
     setBulletSize(bullet);
     bullet.classList.add("bullet");
-
-    let canPenetrate = canGoFast.value && button === "right";
-    let speed = setBulletSpeed(button, bullet);
+    let speed = setBulletSpeed(mode, bullet);
 
     bullet.style.left = `${x}px`;
     let bulletY = 90;
-    function setBulletY() {
-        let newBulletY = bulletY + speed;
-        return newBulletY;
-    }
 
     bullet.style.bottom = `${bulletY}px`;
     document.body.appendChild(bullet);
+
+    return {
+        bullet,
+        bulletY,
+        speed,
+    }
+
+}
+
+function checkForKebabCoalition(bullet, interval, canPenetrate) {
+
+    kebabs.value.forEach((k, index) => {
+        let kebabRect = k.getBoundingClientRect();
+        let bulletRect = bullet.getBoundingClientRect();
+        if (
+            Math.abs(kebabRect.top - bulletRect.top) > 20 ||
+            Math.abs(kebabRect.left - bulletRect.left) >
+            bulletSize.value + 20
+        )
+            return;
+        if (!canPenetrate) {
+            clearInterval(interval);
+            intervals.value = intervals.value.filter((i) => i !== interval);
+            bullets.value = bullets.value.filter((b) => b !== bullet);
+            bullet.remove();
+        }
+        k.remove();
+        score.value += 1
+        clearInterval(kebabIntervals.value[index]);
+        kebabs.value = kebabs.value.filter((k) => k.element !== k);
+    });
+}
+
+function setBulletInterval(bullet, bulletY, canPenetrate, speed) {
+
+    console.log("Im in bullet interval", { bullet, bulletY, canPenetrate, speed });
+
+
     let interval = setInterval(() => {
         bullet.style.bottom = `${bulletY}px`;
-        bulletY = setBulletY();
-        kebabs.value.forEach((k, index) => {
-            let kebabRect = k.getBoundingClientRect();
-            let bulletRect = bullet.getBoundingClientRect();
-            if (
-                Math.abs(kebabRect.top - bulletRect.top) > 20 ||
-                Math.abs(kebabRect.left - bulletRect.left) >
-                    bulletSize.value + 20
-            )
-                return;
-            if (!canPenetrate) {
-                clearInterval(interval);
-                intervals.value = intervals.value.filter((i) => i !== interval);
-                bullets.value = bullets.value.filter((b) => b !== bullet);
-                bullet.remove();
-            }
-            removedKebabs.value.push(k);
-            k.remove();
-            score.value = removedKebabs.value.length;
-            clearInterval(kebabIntervals.value[index]);
-            kebabs.value = kebabs.value.filter((k) => k.element !== k);
-        });
+        bulletY = moveBullet(bullet, bulletY, speed);
+
+        console.log("Checking", canPenetrate)
+
+        checkForKebabCoalition(bullet, interval, canPenetrate)
+
+
         intervals.value.push(interval);
         if (bulletY > window.innerHeight) {
             clearInterval(interval);
@@ -308,17 +323,46 @@ function shot(button) {
     }, 20);
 }
 
+function shot(mode = "primary") {
+    if (!ready.value) return;
+
+    if (!cansShot.value) return;
+
+    if (!["primary", "super"].includes(mode)) return
+    if (mode === "super" && !canGoFast.value) return;
+
+    const { bullet, bulletY, speed } = drawBulletToScreen(mode);
+
+    let canPenetrate = canGoFast.value && mode === "super";
+
+
+    setBulletInterval(bullet, bulletY, canPenetrate, speed)
+
+    if (canPenetrate) canGoFast.value = false
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 watch(score, () => {
     if (score.value === 0) return;
     if (score.value % 20 === 0) {
         bulletSize.value = 50;
-        remingBigBullet.value = 3;
+        remainingBigBullet.value = 3;
     }
     if (score.value % 100 === 0) {
         bulletSize.value = 100;
-        remingBigBullet.value = 8;
+        remainingBigBullet.value = 8;
     }
 });
+
+watch(cansShot, async (newValue, oldValue) => {
+    if (newValue === false) {
+        await sleep(250);
+        cansShot.value = true
+    }
+})
 
 watch(lives, () => {
     if (lives.value === 0) {
@@ -327,6 +371,7 @@ watch(lives, () => {
     }
     inner2.value.style.width = `${lives.value * 10}%`;
 });
+
 </script>
 
 <style>
@@ -350,12 +395,21 @@ body {
     align-items: center;
     font-family: poppins, sans-serif;
 }
-#game {
+
+#background{
     height: 100vh;
     width: 100vw;
     background: url("../assets/background.jpg") no-repeat;
     background-size: 100% 100%;
     position: relative;
+}
+
+#game {
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.2);
+    position: relative;
+    backdrop-filter: blur(10px);
 }
 
 #player {
@@ -405,6 +459,7 @@ body {
     pointer-events: none;
     user-select: none;
 }
+
 #infos {
     position: absolute;
     top: 20px;
@@ -459,6 +514,7 @@ body {
     transform: translate(-50%, 0);
     border-radius: 10px;
 }
+
 .goFast .inner {
     width: 0;
     height: 100%;
@@ -474,6 +530,7 @@ body {
     0% {
         width: 0;
     }
+
     100% {
         width: 100%;
     }
@@ -492,11 +549,13 @@ body {
     width: 200px;
     position: relative;
 }
+
 .life img {
     width: 50px;
     height: 50px;
     z-index: 2;
 }
+
 .lifeBar {
     width: 180px;
     height: 30px;
