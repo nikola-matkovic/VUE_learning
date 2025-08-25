@@ -34,6 +34,43 @@ import { ref, onMounted, watch } from "vue";
 import kebabsImage from "../assets/kebab.webp";
 import rakijaImg from "../assets/sljiva.webp";
 
+/* ================== KONFIGURACIJA IGRE ================== */
+const PLAYER_HITBOX_X = 100;
+const PLAYER_HITBOX_Y = 150;
+
+const BULLET_HITBOX_X = 20;
+const BULLET_HITBOX_Y = 20;
+
+const BULLET_DEFAULT_SIZE = 20;
+const BULLET_MEDIUM_SIZE = 50;
+const BULLET_BIG_SIZE = 100;
+
+const BULLET_MEDIUM_TRIGGER = 20;   // score % 20
+const BULLET_BIG_TRIGGER = 50;     // score % 100
+
+const BULLET_MEDIUM_AMMO = 5;
+const BULLET_BIG_AMMO = 10;
+
+const BULLET_DEFAULT_SPEED = 5;
+const BULLET_FAST_SPEED = 10;
+
+const BULLET_COOLDOWN = 250; // ms
+
+const kebab_FALL_INTERVAL = 5;   // ms tick za pad kebaba
+const RAKIJA_FALL_INTERVAL = 5;  // ms tick za pad rakije
+
+const INITIAL_LIVES = 5;
+const MAX_LIVES = 10;
+
+const LIFE_WIDTH_MULTIPLIER = 10; // % širine bara po životu
+
+const Kebab_INTERVAL = 1000;  // ms spawn kebaba
+const RAKIJA_INTERVAL_RANDOM = 60000; // max random ms za spawn rakije
+
+const GO_FAST_DELAY = 2000; // ms do aktivacije super moda
+const SUPER_MODE_RECOVERY = 1000; // ms animacija vraćanja
+
+/* ================== STANJE IGRE ================== */
 const player = ref(null);
 const bit = ref(null);
 const original = ref(null);
@@ -43,7 +80,7 @@ const inner2 = ref(null);
 const score = ref(0);
 const highScore = ref(0);
 const lives = ref(3);
-const bulletSize = ref(20);
+const bulletSize = ref(BULLET_DEFAULT_SIZE);
 const ready = ref(false);
 const kebabs = ref([]);
 const rakijas = ref([]);
@@ -56,13 +93,13 @@ const kebabIntervals = ref([]);
 const rakijaIntervals = ref([]);
 const lifeTimeout = ref(null);
 const createKebabsInterval = ref(null);
-const speedOfKebabs = ref(1000);
+const speedOfKebabs = ref(Kebab_INTERVAL);
 
 
 onMounted(() => {
 
     document.addEventListener("keydown", (e) => {
-        if (e.code === "Space" || e.code === "3") {
+        if (e.code === "Space" || e.code === "Digit4") {
             shot("primary");
         }
         if (e.code === "KeyS") {
@@ -81,22 +118,22 @@ function setBulletSize(bullet) {
     if (remainingBigBullet.value > 0) {
         remainingBigBullet.value--;
     } else {
-        bulletSize.value = 20;
+        bulletSize.value = BULLET_DEFAULT_SIZE;
     }
 
-    if (bulletSize.value === 20) {
+    if (bulletSize.value === BULLET_DEFAULT_SIZE) {
         bullet.className = "smallBullet";
     }
-    if (bulletSize.value === 50) {
+    if (bulletSize.value === BULLET_MEDIUM_SIZE) {
         bullet.className = "biggerBullet";
     }
-    if (bulletSize.value === 100) {
+    if (bulletSize.value === BULLET_BIG_SIZE) {
         bullet.className = "biggestBullet";
     }
 }
 
 function setBulletSpeed(button, bullet) {
-    let speed = 5;
+    let speed = BULLET_DEFAULT_SPEED;
     if (button === "super" && canGoFast.value) {
 
         bullet.classList.add("fast");
@@ -105,8 +142,8 @@ function setBulletSpeed(button, bullet) {
             clearTimeout(goFastTimeout);
             setGoFastTimeout();
             inner.value.classList.add("animate");
-        }, 1000);
-        speed = 10;
+        }, SUPER_MODE_RECOVERY);
+        speed = BULLET_FAST_SPEED;
     }
     return speed;
 }
@@ -117,7 +154,7 @@ function addLife() {
         clearTimeout(lifeTimeout.value);
         speedOfKebabs.value -= 100;
         addLife();
-    }, Math.random() * 60000);
+    }, Math.random() * RAKIJA_INTERVAL_RANDOM);
 }
 
 function checkHighScore() {
@@ -137,13 +174,13 @@ function movePlayer() {
         const rakijaRect = rakija.getBoundingClientRect();
         const playerRect = player.value.getBoundingClientRect();
         if (
-            Math.abs(rakijaRect.top - playerRect.top) > 150 ||
-            Math.abs(rakijaRect.left - playerRect.left) > 100
+            Math.abs(rakijaRect.top - playerRect.top) > PLAYER_HITBOX_Y ||
+            Math.abs(rakijaRect.left - playerRect.left) > PLAYER_HITBOX_X
         )
             return;
 
         rakija.remove();
-        if (lives.value < 10) lives.value += 1;
+        if (lives.value < MAX_LIVES) lives.value += 1;
         rakijas.value = rakijas.value.filter((r) => r !== rakija);
     });
 }
@@ -152,7 +189,7 @@ function setGoFastTimeout() {
     inner.value.classList.add("animate");
     goFastTimeout = setTimeout(() => {
         canGoFast.value = true;
-    }, 2000);
+    }, GO_FAST_DELAY);
 }
 
 function createKebab() {
@@ -180,7 +217,7 @@ function createKebab() {
             lives.value -= 1;
             kebabs.value = kebabs.value.filter((k) => k.id !== kebabData.id);
         }
-    }, 5);
+    }, kebab_FALL_INTERVAL);
 
     kebabData.intervalId = interval;
     kebabs.value.push(kebabData);
@@ -206,14 +243,14 @@ function createRakija() {
                 (k) => k !== interval
             );
         }
-    }, 5);
+    }, RAKIJA_FALL_INTERVAL);
     rakijaIntervals.value.push(interval);
 }
 
 function play() {
     ready.value = !ready.value;
     score.value = 0;
-    lives.value = 5;
+    lives.value = INITIAL_LIVES;
     if (ready.value) {
         bit.value.play();
         original.value.pause();
@@ -221,11 +258,11 @@ function play() {
         bit.value.pause();
         original.value.play();
     }
-    createKebabsInterval.value = setInterval(createKebab, 1000);
+    createKebabsInterval.value = setInterval(createKebab, Kebab_INTERVAL);
     setGoFastTimeout();
     checkHighScore();
     addLife();
-    inner2.value.style.width = `${lives.value * 10}%`;
+    inner2.value.style.width = `${lives.value * LIFE_WIDTH_MULTIPLIER}%`;
 }
 
 
@@ -276,7 +313,7 @@ function checkForKebabCoalition(bullet, interval, canPenetrate) {
 
         if (
             Math.abs(kebabRect.top - bulletRect.top) > 50 ||
-            Math.abs(kebabRect.left - bulletRect.left) > bulletSize.value + 20
+            Math.abs(kebabRect.left - bulletRect.left) > bulletSize.value + BULLET_HITBOX_X
         ) {
             continue;
         }
@@ -350,19 +387,19 @@ function sleep(ms) {
 
 watch(score, () => {
     if (score.value === 0) return;
-    if (score.value % 20 === 0) {
-        bulletSize.value = 50;
-        remainingBigBullet.value = 3;
+    if (score.value % BULLET_MEDIUM_TRIGGER === 0) {
+        bulletSize.value = BULLET_MEDIUM_SIZE;
+        remainingBigBullet.value = BULLET_MEDIUM_AMMO;
     }
-    if (score.value % 100 === 0) {
-        bulletSize.value = 100;
-        remainingBigBullet.value = 8;
+    if (score.value % BULLET_BIG_TRIGGER === 0) {
+        bulletSize.value = BULLET_BIG_SIZE;
+        remainingBigBullet.value = BULLET_BIG_AMMO;
     }
 });
 
 watch(cansShot, async (newValue, oldValue) => {
     if (newValue === false) {
-        await sleep(250);
+        await sleep(BULLET_COOLDOWN);
         cansShot.value = true
     }
 })
@@ -370,9 +407,9 @@ watch(cansShot, async (newValue, oldValue) => {
 watch(lives, () => {
     if (lives.value === 0) {
         alert("Game Over");
-        pause();
+        // pause();
     }
-    inner2.value.style.width = `${lives.value * 10}%`;
+    inner2.value.style.width = `${lives.value * LIFE_WIDTH_MULTIPLIER}%`;
 });
 
 </script>
