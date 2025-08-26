@@ -67,7 +67,7 @@ const LIFE_WIDTH_MULTIPLIER = 10; // % širine bara po životu
 const Kebab_INTERVAL = 1000;  // ms spawn kebaba
 const RAKIJA_INTERVAL_RANDOM = 60000; // max random ms za spawn rakije
 
-const GO_FAST_DELAY = 2000; // ms do aktivacije super moda
+const GO_FAST_DELAY = 1000; // ms do aktivacije super moda
 const SUPER_MODE_RECOVERY = 1000; // ms animacija vraćanja
 
 /* ================== STANJE IGRE ================== */
@@ -152,7 +152,6 @@ function addLife() {
     lifeTimeout.value = setTimeout(() => {
         createRakija();
         clearTimeout(lifeTimeout.value);
-        speedOfKebabs.value -= 100;
         addLife();
     }, Math.random() * RAKIJA_INTERVAL_RANDOM);
 }
@@ -569,7 +568,7 @@ body {
 }
 
 .inner.animate {
-    animation: goFast 2s linear forwards;
+    animation: goFast 1s linear forwards;
 }
 
 @keyframes goFast {
