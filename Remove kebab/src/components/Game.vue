@@ -258,9 +258,6 @@ function play() {
     if (ready.value) {
         bit.value.play();
         original.value.pause();
-    } else {
-        bit.value.pause();
-        original.value.play();
     }
     createKebabsInterval.value = setInterval(createKebab, Kebab_INTERVAL);
     setGoFastTimeout();
@@ -410,9 +407,10 @@ watch(cansShot, async (newValue, oldValue) => {
 
 watch(lives, () => {
     if (lives.value === 0) {
-        
         checkHighScore();
         alert("Game is Over, but who am i to tell you to stop war crimes? Continue as long as you want");
+        bit.value.pause();
+        original.value.play();
     }
     inner2.value.style.width = `${lives.value * LIFE_WIDTH_MULTIPLIER}%`;
 });
