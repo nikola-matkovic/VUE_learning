@@ -406,7 +406,9 @@ watch(cansShot, async (newValue, oldValue) => {
 
 watch(lives, () => {
     if (lives.value === 0) {
-        alert("Game Over");
+        
+        checkHighScore();
+        alert("Game is Over, but who am i to tell you to stop war crimes? Continue as long as you want");
         // pause();
     }
     inner2.value.style.width = `${lives.value * LIFE_WIDTH_MULTIPLIER}%`;
