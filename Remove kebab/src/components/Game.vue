@@ -247,6 +247,11 @@ function createRakija() {
     rakijaIntervals.value.push(interval);
 }
 
+
+function pause(){
+    alert("Fine, You paused, but you can't just pause like that in real war!")
+}
+
 function play() {
     ready.value = !ready.value;
     score.value = 0;
@@ -409,7 +414,6 @@ watch(lives, () => {
         
         checkHighScore();
         alert("Game is Over, but who am i to tell you to stop war crimes? Continue as long as you want");
-        // pause();
     }
     inner2.value.style.width = `${lives.value * LIFE_WIDTH_MULTIPLIER}%`;
 });
